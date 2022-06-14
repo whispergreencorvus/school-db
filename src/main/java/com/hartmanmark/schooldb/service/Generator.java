@@ -1,4 +1,4 @@
-package com.hartmanmark.schooldb;
+package com.hartmanmark.schooldb.service;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,21 +8,23 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import com.hartmanmark.schooldb.inserter.Inserter;
+
 public class Generator {
 
 	private String groupName;
-	private String firstName;
-	private String lastName;
-	protected List<String> randomFirstName = new ArrayList<String>();
-	protected List<String> randomLastName = new ArrayList<String>();
+	private final int MAX_NUMBER_OF_STUDENTS_IN_ONE_GROUP = 30;
+	private final int MIN_NUMBER_OF_STUDENTS_IN_ONE_GROUP = 10;
+	private List<String> randomFirstName = new ArrayList<String>();
+	private List<String> randomLastName = new ArrayList<String>();
 	private Inserter inserter = new Inserter();
 
-	public void generate(File pathToFirstName, File pathToLastName) throws IOException, SQLException {
+	public void generate(File pathToFirstName, File pathToLastName)
+			throws IOException, SQLException, ClassNotFoundException {
 		getListOfRandomFirstNames(pathToFirstName);
 		getListOfRandomLastNames(pathToLastName);
-		getStudentsNames();
-		getGroupsNames();
 		inserter.insertCourses();
+		createGroups();
 	}
 
 	private String getRandomAlphaString() {
@@ -45,17 +47,18 @@ public class Generator {
 		return randomNumericString.toString();
 	}
 
-	private void getGroupsNames() throws SQLException {
+	private void createGroups() throws SQLException, ClassNotFoundException, IOException {
 		for (int i = 1; i < 11; i++) {
 			String firstParthOfGroupName = getRandomAlphaString();
 			String lastParthOfGroupName = getRandomNumericString();
 			groupName = firstParthOfGroupName + '-' + lastParthOfGroupName;
-			inserter.insertGroups(groupName, i);
+			inserter.insertGroups(groupName);
+			putStudentsInOneGroup(i);
 		}
-		System.err.println("Groups added");/////////////////////////
 	}
 
-	private void getListOfRandomFirstNames(File pathToFirstNames) throws IOException {
+	private void getListOfRandomFirstNames(File pathToFirstNames)
+			throws IOException, ClassNotFoundException, SQLException {
 		Scanner scannerFirstName = new Scanner(pathToFirstNames);
 		while (scannerFirstName.hasNextLine()) {
 			randomFirstName.add(scannerFirstName.nextLine());
@@ -63,14 +66,19 @@ public class Generator {
 		scannerFirstName.close();
 	}
 
-	private void getStudentsNames() throws IOException, SQLException {
+	private void putStudentsInOneGroup(int idGroup) throws IOException, SQLException, ClassNotFoundException {
 		Random random = new Random();
-		for (int i = 1; i < 201; i++) {
-			firstName = randomFirstName.get(random.nextInt(randomFirstName.size()));
-			lastName = randomLastName.get(random.nextInt(randomLastName.size()));
-			inserter.insertStudents(firstName, lastName, i);
+		int range = random.nextInt(MAX_NUMBER_OF_STUDENTS_IN_ONE_GROUP - MIN_NUMBER_OF_STUDENTS_IN_ONE_GROUP)
+				+ MIN_NUMBER_OF_STUDENTS_IN_ONE_GROUP;
+		StringBuilder insertStudentsInOneGroup = new StringBuilder();
+		for (int i = 0; i < range; i++) {
+			String firstName = randomFirstName.get(random.nextInt(randomFirstName.size()));
+			String lastName = randomLastName.get(random.nextInt(randomLastName.size()));
+			String sqlQuery = "INSERT INTO school.students(STUDENT_ID, GROUP_ID, FIRST_NAME, LAST_NAME) VALUES (DEFAULT ,'"
+					+ idGroup + "' , '" + firstName + "', '" + lastName + "');";
+			insertStudentsInOneGroup.append(sqlQuery);
 		}
-		System.err.println("Students added");///////////////////////////
+		inserter.insertStudents(insertStudentsInOneGroup);
 	}
 
 	private void getListOfRandomLastNames(File pathToLastNames) throws IOException {

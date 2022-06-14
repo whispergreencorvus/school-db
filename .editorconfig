@@ -14,3 +14,4 @@ indent_size = 4
 # Character set to be used in java files.
 charset = utf-8
 trim_trailing_whitespace = true
+
