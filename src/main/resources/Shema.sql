@@ -7,19 +7,23 @@ CREATE TABLE school.students(
     STUDENT_ID smallint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     GROUP_ID char(2),
     FIRST_NAME char(20),
-    LAST_NAME char(20));
+    LAST_NAME char(20)
+    );
 
 CREATE TABLE school.courses(
     COURSE_ID smallint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     COURSE_NAME char(20),
-    COURSE_DESCRIPTION TEXT);
+    COURSE_DESCRIPTION TEXT
+    );
     
 CREATE TABLE school.groups(
     GROUP_ID smallint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    GROUP_NAME char(5));
+    GROUP_NAME char(5)
+    );
   
 CREATE TABLE school.students_courses (
     ID smallint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     STUDENT_ID smallint references school.students(STUDENT_ID) ON DELETE CASCADE,
-    COURSE_ID smallint references school.courses(COURSE_ID) ON DELETE CASCADE);  
+    COURSE_ID smallint references school.courses(COURSE_ID) ON DELETE CASCADE
+    );  
     

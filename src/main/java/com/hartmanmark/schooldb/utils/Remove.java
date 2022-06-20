@@ -59,7 +59,7 @@ public class Remove {
         PreparedStatement statement = Connector.getConnection().prepareStatement(str);
         statement.execute();
         System.out.println("Student by ID = [" + studentId + "] removed");
-        System.out.println(enter + numberOfIdStudents() + "\n" + exit);
+        System.out.println("To remove next student, enter an student ID between 1 and " + numberOfIdStudents() + "\n" + exit);
     }
 
     private static int numberOfIdStudents()

@@ -21,7 +21,8 @@ public class Appender {
     private static String firstNamePrint = "Please enter student first name: ";
     private static String lastNamePrint = "Please enter student last name: ";
     private static String exit = "For return input [exit]";
-    private static String creadedStudent = "A new student has been successfully added.";
+    private static String creadedStudent = "A new student has been successfully added: ";
+    private static String addNext = "To add next student enter student first name: ";
 
     public static void add() throws ClassNotFoundException, InputIsNonIntegerException, InputIsNonChooseRangeException,
             InputIsMoreThanOneCharacterException, SQLException, IOException, ConnectionIsNullException,
@@ -32,9 +33,15 @@ public class Appender {
         String lastName = null;
         while (true) {
             firstName = scanner.nextLine();
+            if (firstName.equalsIgnoreCase("exit")) {
+                ConsoleMenu consoleMenu = new ConsoleMenu();
+                consoleMenu.runConsole();
+                scanner.close();
+                break;
+            }
             System.out.println(lastNamePrint + "\n" + exit);
             lastName = scanner.nextLine();
-            if (firstName.equalsIgnoreCase("exit") || lastName.equalsIgnoreCase("exit")) {
+            if (lastName.equalsIgnoreCase("exit")) {
                 ConsoleMenu consoleMenu = new ConsoleMenu();
                 consoleMenu.runConsole();
                 scanner.close();
@@ -63,6 +70,6 @@ public class Appender {
                 + firstName + "','" + lastName + "' );";
         PreparedStatement statement = Connector.getConnection().prepareStatement(str);
         statement.execute();
-        System.out.println(creadedStudent + "\n" + firstNamePrint + "\n" + exit);
+        System.out.println(creadedStudent + "[" + firstName + " " + lastName + "]" + "\n" + addNext);
     }
 }

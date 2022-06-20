@@ -40,7 +40,7 @@ public class Validator {
         if (input.isEmpty()) {
             throw new InputDataIsEmptyException("Input string is empty. Try again.");
         }
-        if (input.matches("[^w]+")) {
+        if (input.matches("[^w^[1-9]]+")) {
             throw new InputDataIsSymbolicException("Input data is symbolic. Try again.");
         }
         if (input.matches("[a-zA-Z]+")) {
@@ -59,7 +59,7 @@ public class Validator {
         if (input.matches("[0-9]+")) {
             throw new InputDataIsNumericException("Input data is numeric. Try again.");
         }
-        if (input.matches("[^w]+")) {
+        if (input.matches("[^w^[a-zA-Z]]+")) {
             throw new InputDataIsSymbolicException("Input data is symbolic. Try again.");
         }
     }
