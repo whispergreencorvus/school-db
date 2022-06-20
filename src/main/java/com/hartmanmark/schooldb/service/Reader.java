@@ -18,14 +18,15 @@ public class Reader {
     private static Properties properties;
     private static File file;
     private static String pathToProperties = "/home/user/java/GitLab/Task 7/task-7/path.properties";
+    private static String pathToDataBaseProperties = "/home/user/java/GitLab/Task 7/task-7/database.properties";
 
     public void read() throws IOException, ClassNotFoundException, SQLException, ConnectionIsNullException {
         readFirstName();
         readLastName();
         generator.generate(getPathToFirstName(), getPathToLastName());
-    }
+    } 
 
-    public static File readPropertyFile(String keyProperty) throws IOException, ClassNotFoundException, SQLException {
+    public static File readPathProperties(String keyProperty) throws IOException, ClassNotFoundException, SQLException {
         fileReader = new FileReader(pathToProperties);
         properties = new Properties();
         properties.load(fileReader);
@@ -33,12 +34,21 @@ public class Reader {
         return file;
     }
 
+    public static File readDataBaseProperties(String keyProperty)
+            throws IOException, ClassNotFoundException, SQLException {
+        fileReader = new FileReader(pathToDataBaseProperties);
+        properties = new Properties();
+        properties.load(fileReader);
+        file = new File(properties.getProperty(keyProperty));
+        return file;
+    }
+
     private void readFirstName() throws ClassNotFoundException, IOException, SQLException {
-        setPathToFirstName(readPropertyFile("firstName"));
+        setPathToFirstName(readPathProperties("firstName"));
     }
 
     private void readLastName() throws ClassNotFoundException, IOException, SQLException {
-        setPathToLastName(readPropertyFile("lastName"));
+        setPathToLastName(readPathProperties("lastName"));
     }
 
     public File getPathToFirstName() {

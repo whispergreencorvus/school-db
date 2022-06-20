@@ -1,4 +1,4 @@
-package com.hartmanmark.schooldb.dao;
+package com.hartmanmark.schooldb.utils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -7,20 +7,22 @@ import java.sql.SQLException;
 
 import org.apache.ibatis.jdbc.ScriptRunner;
 
+import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.service.Reader;
 
-public class Creator {
+public class CreatorDataBase {
     private Reader reader = new Reader();
 
     public void createDataBase() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        ScriptRunner scriptRunner = new ScriptRunner(Connector.connect());
+        ScriptRunner scriptRunner = new ScriptRunner(Connector.getConnection());
         scriptRunner.runScript(readSQLFile());
         reader.read();
     }
 
     private BufferedReader readSQLFile() throws ClassNotFoundException, IOException, SQLException {
-        BufferedReader readerSchema = new BufferedReader(new FileReader(Reader.readPropertyFile("pathToShemaSQLFile")));
+        BufferedReader readerSchema = new BufferedReader(new FileReader(Reader.readPathProperties("pathToShemaSQLFile")));
         return readerSchema;
     }
 }
+ 

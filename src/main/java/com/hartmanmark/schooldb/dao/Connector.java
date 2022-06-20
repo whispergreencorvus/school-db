@@ -7,19 +7,25 @@ import java.sql.SQLException;
 
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.service.Reader;
-import com.hartmanmark.schooldb.validator.ConnectionValidator;
 
 public class Connector {
 
-    public static Connection connect() throws ClassNotFoundException, IOException, ConnectionIsNullException {
+    public static Connection getConnection() throws ClassNotFoundException, IOException, ConnectionIsNullException {
         Connection connection = null;
         try {
-            connection = DriverManager.getConnection(Reader.readPropertyFile("url").toString(),
-                    Reader.readPropertyFile("user").toString(), Reader.readPropertyFile("password").toString());
-            ConnectionValidator.verify(connection);
+            connection = DriverManager.getConnection(Reader.readDataBaseProperties("url").toString(),
+                    Reader.readDataBaseProperties("user").toString(),
+                    Reader.readDataBaseProperties("password").toString());
+            verify(connection);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return connection;
+    }
+
+    private static void verify(Connection connection) throws ConnectionIsNullException {
+        if (connection == null) {
+            throw new ConnectionIsNullException("Failed to make connection. Connection is NULL");
+        }
     }
 }

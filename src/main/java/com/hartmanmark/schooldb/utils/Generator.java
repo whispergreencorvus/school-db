@@ -11,7 +11,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.Connector;
-import com.hartmanmark.schooldb.dao.Inserter;
+import com.hartmanmark.schooldb.dao.StudentDao;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 
 public class Generator {
@@ -23,6 +23,7 @@ public class Generator {
     private List<String> randomLastName = new ArrayList<String>();
     private int numberOfStudents;
     private Inserter inserter = new Inserter();
+    private StudentDao studentDao = new StudentDao();
 
     public void generate(File pathToFirstName, File pathToLastName)
             throws IOException, SQLException, ClassNotFoundException, ConnectionIsNullException {
@@ -31,25 +32,18 @@ public class Generator {
         inserter.insertCourses();
         createGroups();
         countOfStudents();
-        createStudentsCoursesTable();
+        studentDao.join();
     }
 
     private void countOfStudents() throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
         String str = "SELECT count(*) from school.students;";
         Integer numberOfStudents = null;
-        PreparedStatement statement = Connector.connect().prepareStatement(str);
+        PreparedStatement statement = Connector.getConnection().prepareStatement(str);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()) {
             numberOfStudents = Integer.valueOf(resultSet.getString("count"));
         }
         setNumberOfStudents(numberOfStudents);
-    }
-
-    private void createStudentsCoursesTable()
-            throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        for (int i = 0; i < getNumberOfStudents(); i++) {
-            inserter.joinStudentsAndCourses();
-        }
     }
 
     private String getRandomAlphaString() {
