@@ -5,7 +5,7 @@ CREATE SCHEMA school;
 
 CREATE TABLE school.students(
     STUDENT_ID smallint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    GROUP_ID char(2),
+    GROUP_ID smallint,
     FIRST_NAME char(20),
     LAST_NAME char(20)
     );
@@ -21,8 +21,8 @@ CREATE TABLE school.groups(
     GROUP_NAME char(5)
     );
   
-CREATE TABLE school.students_courses (
-    ID smallint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+CREATE TABLE school.students_courses (  
+    ID smallint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,    
     STUDENT_ID smallint references school.students(STUDENT_ID) ON DELETE CASCADE,
     COURSE_ID smallint references school.courses(COURSE_ID) ON DELETE CASCADE
     );  

@@ -1,66 +1,60 @@
 package com.hartmanmark.schooldb.validator;
 
-import com.hartmanmark.schooldb.exception.InputDataIsAlphabeticException;
-import com.hartmanmark.schooldb.exception.InputDataIsEmptyException;
-import com.hartmanmark.schooldb.exception.InputDataIsNumericException;
-import com.hartmanmark.schooldb.exception.InputDataIsSymbolicException;
-import com.hartmanmark.schooldb.exception.InputIsMoreThanOneCharacterException;
-import com.hartmanmark.schooldb.exception.InputIsNonChooseRangeException;
-import com.hartmanmark.schooldb.exception.InputIsNonIntegerException;
+import java.io.IOException;
+import java.sql.SQLException;
+
+import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
+import com.hartmanmark.schooldb.utils.RemoveStudents;
 
 public class Validator {
 
-    public static void verifyMenuChoose(String input) throws InputIsNonIntegerException, InputIsNonChooseRangeException,
-            InputIsMoreThanOneCharacterException, InputDataIsEmptyException, InputDataIsSymbolicException {
+    private static final String REGEX_MENU = "[^w^[1-7]]+";
+    private static final String REGEX_REMOVE_OPTION = "[^w^[0-9]]+";
+    private static final String REGEX_ADD_OPTION = "[^wd^[a-zA-Z]]+";
+    private static final String REGEX_ADD = "[^wd^[a-zA-Z]]+";
+
+    public static void verifyMenuChoose(String input) {
         if (input == null) {
-            throw new NumberFormatException("Input data is null");
+            throw new IllegalArgumentException("Input data is null");
         }
         if (input.isEmpty()) {
-            throw new InputDataIsEmptyException("Input string is empty. Try again.");
+            throw new IllegalArgumentException("Input string is empty. Try again.");
         }
-        if (input.matches("[a-zA-Z]+")) {
-            throw new InputIsNonIntegerException("Please enter an integer value");
-        }
-        if (input.matches("[^w^[1-7]]+")) {
-            throw new InputDataIsSymbolicException("Input data is symbolic. Try again.");
-        }
-        if (input.matches("[0-9&&^[890]]")) {
-            throw new InputIsNonChooseRangeException("Please enter an integer value between 1 and 7 ");
+        if (input.matches(REGEX_MENU)) {
+            throw new IllegalArgumentException("Please enter an integer value between 1 and 7");
         }
         if (input.toCharArray().length > 1) {
-            throw new InputIsMoreThanOneCharacterException("Input must be contain only one character");
+            throw new IllegalArgumentException("Input must be contain only one character");
         }
     }
 
     public static void veryfyRemoveOption(String input)
-            throws InputDataIsEmptyException, InputDataIsSymbolicException, InputDataIsAlphabeticException {
+            throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         if (input == null) {
-            throw new NumberFormatException("Input data is null");
+            throw new IllegalArgumentException("Input data is null");
         }
         if (input.isEmpty()) {
-            throw new InputDataIsEmptyException("Input string is empty. Try again.");
+            throw new IllegalArgumentException("Input string is empty. Try again.");
         }
-        if (input.matches("[^w^[1-9]]+")) {
-            throw new InputDataIsSymbolicException("Input data is symbolic. Try again.");
+        if (input.matches(REGEX_REMOVE_OPTION)) {
+            throw new IllegalArgumentException("Please enter an integer value. Try again.");
         }
-        if (input.matches("[a-zA-Z]+")) {
-            throw new InputDataIsAlphabeticException("Input data is alphabetic. Try again.");
+        int inputID = Integer.parseInt(input);
+        int numberOfStudents = RemoveStudents.numberOfIdStudents();
+        if (inputID > numberOfStudents) {
+            throw new IllegalArgumentException("Please enter an integer value between 1 and " + numberOfStudents);
         }
     }
 
-    public static void veryfyAddOption(String input)
-            throws InputDataIsEmptyException, InputDataIsNumericException, InputDataIsSymbolicException {
+    public static void veryfyInputString(String input) {
         if (input == null) {
-            throw new NumberFormatException("Input data is null");
+            throw new IllegalArgumentException("Input data is null");
         }
         if (input.isEmpty()) {
-            throw new InputDataIsEmptyException("Input string is empty. Try again.");
+            throw new IllegalArgumentException("Input string is empty. Try again.");
         }
-        if (input.matches("[0-9]+")) {
-            throw new InputDataIsNumericException("Input data is numeric. Try again.");
-        }
-        if (input.matches("[^w^[a-zA-Z]]+")) {
-            throw new InputDataIsSymbolicException("Input data is symbolic. Try again.");
+        if (input.matches(REGEX_ADD_OPTION)) {
+            throw new IllegalArgumentException("Please enter an string value. Try again.");
         }
     }
 }

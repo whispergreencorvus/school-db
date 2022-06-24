@@ -5,14 +5,10 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
-import com.hartmanmark.schooldb.exception.InputDataIsEmptyException;
-import com.hartmanmark.schooldb.exception.InputDataIsNumericException;
-import com.hartmanmark.schooldb.exception.InputDataIsSymbolicException;
-import com.hartmanmark.schooldb.exception.InputIsMoreThanOneCharacterException;
-import com.hartmanmark.schooldb.exception.InputIsNonChooseRangeException;
-import com.hartmanmark.schooldb.exception.InputIsNonIntegerException;
-import com.hartmanmark.schooldb.utils.Appender;
-import com.hartmanmark.schooldb.utils.Remove;
+import com.hartmanmark.schooldb.utils.AppenderStudents;
+import com.hartmanmark.schooldb.utils.FinderGroups;
+import com.hartmanmark.schooldb.utils.FinderStudents;
+import com.hartmanmark.schooldb.utils.RemoveStudents;
 import com.hartmanmark.schooldb.validator.Validator;
 
 public class ConsoleMenu {
@@ -25,10 +21,7 @@ public class ConsoleMenu {
     private final String welcom = "Welcom to simple sql-jdbc-school app.";
     private final String redLine = String.format("%100s", "").replace(' ', '-') + "\n";
 
-    public void runConsole()
-            throws InputIsNonIntegerException, InputIsNonChooseRangeException, InputIsMoreThanOneCharacterException,
-            ClassNotFoundException, SQLException, IOException, ConnectionIsNullException, InputDataIsEmptyException,
-            InputDataIsNumericException, InputDataIsSymbolicException {
+    public void runConsole() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         System.err.println(redLine);
         System.out.print(welcom);
         while (true) {
@@ -38,14 +31,16 @@ public class ConsoleMenu {
                 input = scanner.nextLine();
                 Validator.verifyMenuChoose(input);
                 if (input.equals("1")) {
-                    System.err.println("method №" + input);
+                    FinderGroups.findGroups();
+                    break;
                 } else if (input.equals("2")) {
-                    System.err.println("method №" + input);
+                    FinderStudents.findStudents();
+                    break;
                 } else if (input.equals("3")) {
-                    Appender.add();
+                    AppenderStudents.add();
                     break;
                 } else if (input.equals("4")) {
-                    Remove.remove();
+                    RemoveStudents.remove();
                     break;
                 } else if (input.equals("5")) {
                     System.err.println("method №" + input);
@@ -56,17 +51,7 @@ public class ConsoleMenu {
                     break;
                 }
                 scanner.close();
-            } catch (NumberFormatException e) {
-                System.err.println(e.getMessage());
-            } catch (InputDataIsEmptyException e) {
-                System.err.println(e.getMessage());
-            } catch (InputIsNonIntegerException e) {
-                System.err.println(e.getMessage());
-            } catch (InputDataIsSymbolicException e) {
-                System.err.println(e.getMessage());
-            } catch (InputIsNonChooseRangeException e) {
-                System.err.println(e.getMessage());
-            } catch (InputIsMoreThanOneCharacterException e) {
+            } catch (IllegalArgumentException e) {
                 System.err.println(e.getMessage());
             }
         }

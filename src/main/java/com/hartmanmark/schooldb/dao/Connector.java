@@ -10,22 +10,19 @@ import com.hartmanmark.schooldb.service.Reader;
 
 public class Connector {
 
-    public static Connection getConnection() throws ClassNotFoundException, IOException, ConnectionIsNullException {
+    public static Connection getConnection()
+            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
         Connection connection = null;
         try {
             connection = DriverManager.getConnection(Reader.readDataBaseProperties("url").toString(),
                     Reader.readDataBaseProperties("user").toString(),
                     Reader.readDataBaseProperties("password").toString());
-            verify(connection);
+            if (connection == null) {
+                throw new ConnectionIsNullException("Failed to make connection. Connection is NULL");
+            }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new SQLException(e);
         }
         return connection;
-    }
-
-    private static void verify(Connection connection) throws ConnectionIsNullException {
-        if (connection == null) {
-            throw new ConnectionIsNullException("Failed to make connection. Connection is NULL");
-        }
     }
 }

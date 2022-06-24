@@ -1,9 +1,11 @@
 package com.hartmanmark.schooldb.dao;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Random;
 
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
@@ -17,14 +19,14 @@ public class StudentDao {
     private int numberOfStudents;
     private int numberIdInStudentsCoursesTable;
 
-    public void join() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+    public void createRelation() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         countOfStudents();
         createStudents();
         countStudentsCoursesID();
-        joinStudentsAndCourses();
+        createRelationStudentsCourses();
     }
 
-    private void joinStudentsAndCourses()
+    private void createRelationStudentsCourses()
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         Random random = new Random();
         StringBuilder string = new StringBuilder();
@@ -53,27 +55,32 @@ public class StudentDao {
         statement.execute();
     }
 
-    private void countOfStudents() throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
-        String str = "SELECT count(*) from school.students;";
-        Integer numberOfStudents = null;
-        PreparedStatement statement = Connector.getConnection().prepareStatement(str);
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            numberOfStudents = Integer.valueOf(resultSet.getString("count"));
+    private int countOfStudents() throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
+        try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
+            String str = "SELECT count(*) from school.students;";
+            Integer numberOfStudents = null;
+            ResultSet rs = stmt.executeQuery(str);
+            while (rs.next()) {
+                numberOfStudents = Integer.valueOf(rs.getString("count"));
+            }
+            setNumberOfStudents(numberOfStudents);
+            return numberOfStudents;
+        } catch (SQLException e) {
+            throw new SQLException(e);
         }
-        setNumberOfStudents(numberOfStudents);
     }
 
-    private void countStudentsCoursesID()
+    private int countStudentsCoursesID()
             throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
-        String str = "SELECT count(*) from school.students_courses;";
-        Integer numberIdInStudentsCoursesTable = null;
-        PreparedStatement statement = Connector.getConnection().prepareStatement(str);
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            numberIdInStudentsCoursesTable = Integer.valueOf(resultSet.getString("count"));
+        try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
+            String countQuery = "SELECT count(*) from school.students_courses;";
+            ResultSet rs = stmt.executeQuery(countQuery);
+            while (rs.next()) {
+                numberIdInStudentsCoursesTable = Integer.valueOf(rs.getString("count"));
+            }
+            setNumberIdInStudentsCoursesTable(numberIdInStudentsCoursesTable);
+            return numberIdInStudentsCoursesTable;
         }
-        setNumberIdInStudentsCoursesTable(numberIdInStudentsCoursesTable);
     }
 
     public void setNumberOfStudents(int numberOfStudents) {

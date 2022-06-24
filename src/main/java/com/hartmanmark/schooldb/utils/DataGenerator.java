@@ -14,15 +14,15 @@ import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.dao.StudentDao;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 
-public class Generator {
+public class DataGenerator {
 
     private String groupName;
     private final int MAX_NUMBER_OF_STUDENTS_IN_ONE_GROUP = 30;
-    private final int MIN_NUMBER_OF_STUDENTS_IN_ONE_GROUP = 10;
+    private final int MIN_NUMBER_OF_STUDENTS_IN_ONE_GROUP = 15;
     private List<String> randomFirstName = new ArrayList<String>();
     private List<String> randomLastName = new ArrayList<String>();
     private int numberOfStudents;
-    private Inserter inserter = new Inserter();
+    private DataInserter inserter = new DataInserter();
     private StudentDao studentDao = new StudentDao();
 
     public void generate(File pathToFirstName, File pathToLastName)
@@ -32,13 +32,13 @@ public class Generator {
         inserter.insertCourses();
         createGroups();
         countOfStudents();
-        studentDao.join();
+        studentDao.createRelation();
     }
 
     private void countOfStudents() throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
-        String str = "SELECT count(*) from school.students;";
+        String countStudentsQuery = "SELECT count(*) from school.students;";
         Integer numberOfStudents = null;
-        PreparedStatement statement = Connector.getConnection().prepareStatement(str);
+        PreparedStatement statement = Connector.getConnection().prepareStatement(countStudentsQuery);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()) {
             numberOfStudents = Integer.valueOf(resultSet.getString("count"));

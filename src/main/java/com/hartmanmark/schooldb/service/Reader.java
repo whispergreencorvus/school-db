@@ -7,13 +7,13 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
-import com.hartmanmark.schooldb.utils.Generator;
+import com.hartmanmark.schooldb.utils.DataGenerator;
 
 public class Reader {
 
     private File pathToFirstNames;
     private File pathToLastNames;
-    private Generator generator = new Generator();
+    private DataGenerator generator = new DataGenerator();
     private static FileReader fileReader;
     private static Properties properties;
     private static File file;
