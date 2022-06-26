@@ -38,7 +38,7 @@ public class FinderStudents {
         while (true) {
             System.out.println(enterCourse + "\n" + exit);
             course = scanner.nextLine();
-            
+
             if (course.equalsIgnoreCase("exit")) {
                 ConsoleMenu consoleMenu = new ConsoleMenu();
                 consoleMenu.runConsole();
@@ -55,7 +55,7 @@ public class FinderStudents {
 
     private static void printStudents(String course)
             throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
-        Validator.veryfyInputString(course); 
+        Validator.veryfyInputString(course);
         try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
             String insertQuery = studentsPerGroup + course + "'ORDER BY school.students.last_name;";
             ResultSet resultSet = stmt.executeQuery(insertQuery);

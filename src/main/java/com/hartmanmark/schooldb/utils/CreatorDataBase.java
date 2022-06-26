@@ -25,4 +25,3 @@ public class CreatorDataBase {
         return readerSchema;
     }
 }
- 

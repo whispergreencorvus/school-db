@@ -10,8 +10,8 @@ public class Validator {
 
     private static final String REGEX_MENU = "[^w^[1-7]]+";
     private static final String REGEX_REMOVE_OPTION = "[^w^[0-9]]+";
-    private static final String REGEX_ADD_OPTION = "[^wd^[a-zA-Z]]+";
-    private static final String REGEX_ADD = "[^wd^[a-zA-Z]]+";
+    private static final String REGEX_STRING = "[^wd^[a-zA-Z]]+";
+
 
     public static void verifyMenuChoose(String input) {
         if (input == null) {
@@ -53,7 +53,7 @@ public class Validator {
         if (input.isEmpty()) {
             throw new IllegalArgumentException("Input string is empty. Try again.");
         }
-        if (input.matches(REGEX_ADD_OPTION)) {
+        if (input.matches(REGEX_STRING)) {
             throw new IllegalArgumentException("Please enter an string value. Try again.");
         }
     }

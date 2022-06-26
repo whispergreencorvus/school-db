@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
-import com.hartmanmark.schooldb.utils.AppenderStudents;
+import com.hartmanmark.schooldb.utils.AdderStudents;
 import com.hartmanmark.schooldb.utils.FinderGroups;
 import com.hartmanmark.schooldb.utils.FinderStudents;
 import com.hartmanmark.schooldb.utils.RemoveStudents;
@@ -37,7 +37,7 @@ public class ConsoleMenu {
                     FinderStudents.findStudents();
                     break;
                 } else if (input.equals("3")) {
-                    AppenderStudents.add();
+                    AdderStudents.add();
                     break;
                 } else if (input.equals("4")) {
                     RemoveStudents.remove();

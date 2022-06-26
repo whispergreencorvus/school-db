@@ -14,11 +14,14 @@ import com.hartmanmark.schooldb.output.ConsoleMenu;
 
 public class FinderGroups {
 
-    private static String query = "SELECT school.groups.group_name, COUNT (school.groups.group_name)\n"
-            + "FROM school.students\n" + "JOIN school.groups\n"
-            + "ON school.students.group_id = school.groups.group_id \n" + "GROUP BY school.groups.group_name;";
-    private static String nameOfColumns = "Groups:          Count:";
-    private static String separator =     "-----            --";
+    private static String query = "WITH tab AS (\n" + "    SELECT school.groups.group_name, \n"
+            + "           COUNT(*) AS count_\n" + "    FROM       school.students\n" + "    INNER JOIN school.groups \n"
+            + "            ON school.students.group_id = school.groups.group_id \n"
+            + "    GROUP BY school.groups.group_name\n" + "), cte AS (\n" + "    SELECT group_name,\n"
+            + "           count_,\n" + "           ROW_NUMBER() OVER(\n" + "               PARTITION BY count_ \n"
+            + "               ORDER     BY group_name\n" + "           ) AS rn\n" + "    FROM tab\n" + ")\n"
+            + "SELECT * \n" + "FROM tab \n" + "WHERE count_ IN (SELECT count_ FROM cte WHERE rn = 2);";
+    private static String exit = "For return input [exit]";
 
     public static void findGroups()
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
@@ -46,7 +49,6 @@ public class FinderGroups {
             ResultSet resultSet = stmt.executeQuery(query);
             ResultSetMetaData rsmd = resultSet.getMetaData();
             int columnsNumber = rsmd.getColumnCount();
-            System.out.println(nameOfColumns + "\n" + separator);
             while (resultSet.next()) {
                 for (int i = 1; i <= columnsNumber; i++) {
                     if (i > 1) {
@@ -54,13 +56,14 @@ public class FinderGroups {
                     }
                     String columnValue = resultSet.getString(i);
                     System.out.print(columnValue);
+
                 }
                 System.out.println("");
             }
             resultSet.close();
+            System.out.println(exit);
         } catch (SQLException e) {
             throw new SQLException(e);
         }
     }
-
 }

@@ -24,7 +24,7 @@ public class Reader {
         readFirstName();
         readLastName();
         generator.generate(getPathToFirstName(), getPathToLastName());
-    } 
+    }
 
     public static File readPathProperties(String keyProperty) throws IOException, ClassNotFoundException, SQLException {
         fileReader = new FileReader(pathToProperties);

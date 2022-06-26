@@ -12,7 +12,7 @@ import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.output.ConsoleMenu;
 import com.hartmanmark.schooldb.validator.Validator;
 
-public class AppenderStudents {
+public class AdderStudents {
 
     private static String firstNamePrint = "Please enter student first name: ";
     private static String lastNamePrint = "Please enter student last name: ";
