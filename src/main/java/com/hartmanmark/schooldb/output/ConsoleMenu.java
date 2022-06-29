@@ -5,10 +5,12 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
-import com.hartmanmark.schooldb.utils.AdderStudents;
+import com.hartmanmark.schooldb.utils.AdderStudentsToDataBase;
+import com.hartmanmark.schooldb.utils.AdderStudentsToTheCourse;
 import com.hartmanmark.schooldb.utils.FinderGroups;
 import com.hartmanmark.schooldb.utils.FinderStudents;
-import com.hartmanmark.schooldb.utils.RemoveStudents;
+import com.hartmanmark.schooldb.utils.RemoverStudentsFromDataBase;
+import com.hartmanmark.schooldb.utils.RemoverStudentFromTheCourse;
 import com.hartmanmark.schooldb.validator.Validator;
 
 public class ConsoleMenu {
@@ -37,15 +39,17 @@ public class ConsoleMenu {
                     FinderStudents.findStudents();
                     break;
                 } else if (input.equals("3")) {
-                    AdderStudents.add();
+                    AdderStudentsToDataBase.add();
                     break;
                 } else if (input.equals("4")) {
-                    RemoveStudents.remove();
+                    RemoverStudentsFromDataBase.remove();
                     break;
                 } else if (input.equals("5")) {
-                    System.err.println("method №" + input);
+                    AdderStudentsToTheCourse.add();
+                    break;
                 } else if (input.equals("6")) {
-                    System.err.println("method №" + input);
+                    RemoverStudentFromTheCourse.remove();
+                    break;
                 } else if (input.equals("7")) {
                     System.err.println("Exit");
                     break;

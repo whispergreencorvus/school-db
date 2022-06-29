@@ -12,7 +12,7 @@ import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.output.ConsoleMenu;
 import com.hartmanmark.schooldb.validator.Validator;
 
-public class RemoveStudents {
+public class RemoverStudentsFromDataBase {
 
     private static String removeStudent = "Please enter an student ID between 1 and ";
     private static String exit = "For return input [exit]";

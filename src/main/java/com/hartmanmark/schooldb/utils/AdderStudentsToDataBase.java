@@ -3,7 +3,6 @@ package com.hartmanmark.schooldb.utils;
 import java.sql.Statement;
 import java.io.IOException;
 import java.sql.Connection;
-
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -12,7 +11,7 @@ import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.output.ConsoleMenu;
 import com.hartmanmark.schooldb.validator.Validator;
 
-public class AdderStudents {
+public class AdderStudentsToDataBase {
 
     private static String firstNamePrint = "Please enter student first name: ";
     private static String lastNamePrint = "Please enter student last name: ";
@@ -53,8 +52,7 @@ public class AdderStudents {
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         Validator.veryfyInputString(firstName);
         Validator.veryfyInputString(lastName);
-        try (Connection conn = Connector.getConnection();
-                Statement stmt = conn.createStatement();) {
+        try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
             String insertQuery = "INSERT INTO school.students (STUDENT_ID, GROUP_ID, FIRST_NAME, LAST_NAME) VALUES (DEFAULT, NULL,'"
                     + firstName + "','" + lastName + "' );";
             stmt.executeUpdate(insertQuery);

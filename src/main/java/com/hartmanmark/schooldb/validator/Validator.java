@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
-import com.hartmanmark.schooldb.utils.RemoveStudents;
+import com.hartmanmark.schooldb.utils.RemoverStudentsFromDataBase;
 
 public class Validator {
 
     private static final String REGEX_MENU = "[^w^[1-7]]+";
-    private static final String REGEX_REMOVE_OPTION = "[^w^[0-9]]+";
+    private static final String REGEX_INTEGER = "[^w^[0-9]]+";
     private static final String REGEX_STRING = "[^wd^[a-zA-Z]]+";
 
 
@@ -28,6 +28,18 @@ public class Validator {
         }
     }
 
+    public static void verifyInteger(String input) {
+        if (input == null) {
+            throw new IllegalArgumentException("Input data is null");
+        }
+        if (input.isEmpty()) {
+            throw new IllegalArgumentException("Input string is empty. Try again.");
+        }
+        if (input.matches(REGEX_INTEGER)) {
+            throw new IllegalArgumentException("Please enter an integer value.");
+        }
+    }
+
     public static void veryfyRemoveOption(String input)
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         if (input == null) {
@@ -36,11 +48,11 @@ public class Validator {
         if (input.isEmpty()) {
             throw new IllegalArgumentException("Input string is empty. Try again.");
         }
-        if (input.matches(REGEX_REMOVE_OPTION)) {
+        if (input.matches(REGEX_INTEGER)) {
             throw new IllegalArgumentException("Please enter an integer value. Try again.");
         }
         int inputID = Integer.parseInt(input);
-        int numberOfStudents = RemoveStudents.numberOfIdStudents();
+        int numberOfStudents = RemoverStudentsFromDataBase.numberOfIdStudents();
         if (inputID > numberOfStudents) {
             throw new IllegalArgumentException("Please enter an integer value between 1 and " + numberOfStudents);
         }

@@ -20,7 +20,8 @@ public class FinderGroups {
             + "    GROUP BY school.groups.group_name\n" + "), cte AS (\n" + "    SELECT group_name,\n"
             + "           count_,\n" + "           ROW_NUMBER() OVER(\n" + "               PARTITION BY count_ \n"
             + "               ORDER     BY group_name\n" + "           ) AS rn\n" + "    FROM tab\n" + ")\n"
-            + "SELECT * \n" + "FROM tab \n" + "WHERE count_ IN (SELECT count_ FROM cte WHERE rn = 2);";
+            + "SELECT * \n" + "FROM tab \n" + "WHERE count_ IN (SELECT count_ FROM cte WHERE rn = 2)"
+                    + "ORDER BY count_;";
     private static String exit = "For return input [exit]";
 
     public static void findGroups()
