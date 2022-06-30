@@ -22,6 +22,7 @@ public class ConsoleMenu {
             "6 - Remove the student from one of his or her courses", "7 - Exit", "" };
     private final String welcom = "Welcom to simple sql-jdbc-school app.";
     private final String redLine = String.format("%100s", "").replace(' ', '-') + "\n";
+    FinderGroups finderGroups = new FinderGroups();
 
     public void runConsole() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         System.err.println(redLine);
@@ -33,10 +34,11 @@ public class ConsoleMenu {
                 input = scanner.nextLine();
                 Validator.verifyMenuChoose(input);
                 if (input.equals("1")) {
-                    System.out.println(FinderGroups.findGroups());
+
+                    System.out.println(finderGroups.findGroups());
                     break;
                 } else if (input.equals("2")) {
-                    FinderStudents.findStudents();                    
+                    FinderStudents.findStudents();
                     break;
                 } else if (input.equals("3")) {
                     AdderStudentsToDataBase.add();

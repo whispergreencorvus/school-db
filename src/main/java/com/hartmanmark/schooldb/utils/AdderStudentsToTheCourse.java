@@ -26,7 +26,7 @@ public class AdderStudentsToTheCourse {
         String studentId = null;
         String course = null;
         while (true) {
-            print(studentsQuery);
+            printStudents(studentsQuery);
             System.out.println(studentIdPrint + "\n" + exit);
             studentId = scanner.nextLine();
             if (studentId.equalsIgnoreCase("exit")) {
@@ -35,7 +35,7 @@ public class AdderStudentsToTheCourse {
                 scanner.close();
                 break;
             }
-            print(courseQuery);
+            printCourses(courseQuery);
             System.out.println(coursePrint + "\n" + exit);
             course = scanner.nextLine();
             if (course.equalsIgnoreCase("exit")) {
@@ -70,23 +70,30 @@ public class AdderStudentsToTheCourse {
         }
     }
 
-    private static void print(String query)
+    private static void printStudents(String query)
             throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
         try {
             Connection conn = Connector.getConnection();
             PreparedStatement stmt = conn.prepareStatement(query);
             ResultSet resultSet = stmt.executeQuery();
-            ResultSetMetaData rsmd = resultSet.getMetaData();
-            int columnsNumber = rsmd.getColumnCount();
             while (resultSet.next()) {
-                for (int i = 1; i <= columnsNumber; i++) {
-                    if (i > 1) {
-                        System.out.print(" ");
-                    }
-                    String columnValue = resultSet.getString(i);
-                    System.out.print(columnValue);
-                }
-                System.out.println("");
+                System.out
+                        .println(resultSet.getString(1) + " " + resultSet.getString(2) + " " + resultSet.getString(3));
+            }
+            resultSet.close();
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        }
+    }
+
+    private static void printCourses(String query)
+            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        try {
+            Connection conn = Connector.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet resultSet = stmt.executeQuery();
+            while (resultSet.next()) {
+                System.out.println(resultSet.getString(1) + " " + resultSet.getString(2));
             }
             resultSet.close();
         } catch (SQLException e) {
