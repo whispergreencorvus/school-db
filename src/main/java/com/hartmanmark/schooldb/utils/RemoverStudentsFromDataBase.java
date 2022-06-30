@@ -2,9 +2,9 @@ package com.hartmanmark.schooldb.utils;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.Connector;
@@ -41,9 +41,12 @@ public class RemoverStudentsFromDataBase {
     private static void removeStudent(String studentId)
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         Validator.veryfyRemoveOption(studentId);
-        try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
-            String deleteQuery = "DELETE FROM school.students WHERE STUDENT_ID=" + studentId;
-            stmt.executeUpdate(deleteQuery);
+        Integer studentIdInt = Integer.parseInt(studentId);
+        try {
+            Connection conn = Connector.getConnection();
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM school.students WHERE STUDENT_ID = ?");
+            stmt.setInt(1, studentIdInt);
+            stmt.executeUpdate();
         } catch (SQLException e) {
             throw new SQLException(e);
         }
@@ -55,9 +58,8 @@ public class RemoverStudentsFromDataBase {
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         Integer numberOfStudents = null;
         Connection conn = Connector.getConnection();
-        Statement stmt = conn.createStatement();
-        String countQuery = "SELECT count(*) from school.students;";
-        ResultSet resultSet = stmt.executeQuery(countQuery);
+        PreparedStatement stmt = conn.prepareStatement("SELECT count(*) from school.students;");
+        ResultSet resultSet = stmt.executeQuery();
         while (resultSet.next()) {
             numberOfStudents = Integer.valueOf(resultSet.getString("count"));
         }

@@ -1,8 +1,8 @@
 package com.hartmanmark.schooldb.utils;
 
-import java.sql.Statement;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -52,10 +52,14 @@ public class AdderStudentsToDataBase {
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         Validator.veryfyInputString(firstName);
         Validator.veryfyInputString(lastName);
-        try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
-            String insertQuery = "INSERT INTO school.students (STUDENT_ID, GROUP_ID, FIRST_NAME, LAST_NAME) VALUES (DEFAULT, NULL,'"
-                    + firstName + "','" + lastName + "' );";
-            stmt.executeUpdate(insertQuery);
+        try {
+            Connection conn = Connector.getConnection();
+            PreparedStatement stmt = conn
+                    .prepareStatement("INSERT INTO school.students (STUDENT_ID, GROUP_ID, FIRST_NAME, LAST_NAME)"
+                            + " VALUES (DEFAULT, NULL,?,?);");
+            stmt.setString(1, firstName);
+            stmt.setString(2, lastName);
+            stmt.executeUpdate();
         } catch (SQLException e) {
             throw new SQLException(e);
         }

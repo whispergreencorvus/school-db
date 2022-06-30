@@ -33,10 +33,10 @@ public class ConsoleMenu {
                 input = scanner.nextLine();
                 Validator.verifyMenuChoose(input);
                 if (input.equals("1")) {
-                    FinderGroups.findGroups();
+                    System.out.println(FinderGroups.findGroups());
                     break;
                 } else if (input.equals("2")) {
-                    FinderStudents.findStudents();
+                    FinderStudents.findStudents();                    
                     break;
                 } else if (input.equals("3")) {
                     AdderStudentsToDataBase.add();

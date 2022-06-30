@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -25,10 +26,12 @@ public class DataInserter {
 
     public void insertGroups(String groupName)
             throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
-        try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
-            String inserGroupsQuery = "INSERT INTO school.groups(GROUP_ID, GROUP_NAME) VALUES (DEFAULT , '" + groupName
-                    + "');";
-            stmt.executeUpdate(inserGroupsQuery);
+        try {
+            Connection conn = Connector.getConnection();
+            PreparedStatement stmt = conn
+                    .prepareStatement("INSERT INTO school.groups(GROUP_ID, GROUP_NAME) VALUES (DEFAULT , ?);");
+            stmt.setString(1, groupName);
+            stmt.executeUpdate();
         } catch (SQLException e) {
             throw new SQLException(e);
         }

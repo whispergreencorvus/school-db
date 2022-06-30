@@ -2,10 +2,10 @@ package com.hartmanmark.schooldb.utils;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.Connector;
@@ -47,19 +47,24 @@ public class AdderStudentsToTheCourse {
             try {
                 addStudent(studentId, course);
             } catch (IllegalArgumentException e) {
-                System.err.println(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
         }
     }
 
-    private static void addStudent(String id, String course)
+    private static void addStudent(String studentId, String courseId)
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        Validator.verifyInteger(course);
-        Validator.verifyInteger(id);
-        try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
-            String insertQuery = "INSERT INTO school.students_courses (id, student_id, course_id) VALUES (DEFAULT," + id
-                    + " ," + course + ");";
-            stmt.executeUpdate(insertQuery);
+        Validator.verifyInteger(studentId);
+        Validator.verifyInteger(courseId);
+        Integer studentIdInt = Integer.parseInt(studentId);
+        Integer courseIdInt = Integer.parseInt(courseId);
+        try {
+            Connection conn = Connector.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO school.students_courses (id, student_id, course_id) VALUES (DEFAULT, ? , ? );");
+            stmt.setInt(1, studentIdInt);
+            stmt.setInt(2, courseIdInt);
+            stmt.executeUpdate();
         } catch (SQLException e) {
             throw new SQLException(e);
         }
@@ -67,8 +72,10 @@ public class AdderStudentsToTheCourse {
 
     private static void print(String query)
             throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
-        try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
-            ResultSet resultSet = stmt.executeQuery(query);
+        try {
+            Connection conn = Connector.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet resultSet = stmt.executeQuery();
             ResultSetMetaData rsmd = resultSet.getMetaData();
             int columnsNumber = rsmd.getColumnCount();
             while (resultSet.next()) {

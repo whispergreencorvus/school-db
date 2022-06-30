@@ -2,10 +2,10 @@ package com.hartmanmark.schooldb.utils;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.Connector;
@@ -51,13 +51,18 @@ public class RemoverStudentFromTheCourse {
         }
     }
 
-    private static void removeStudent(String id, String course)
+    private static void removeStudent(String studentId, String courseId)
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        Validator.verifyInteger(course);
-        try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
-            String insertQuery = "DELETE FROM school.students_courses WHERE student_id = " + id + " AND course_id = "
-                    + course + ";";
-            stmt.executeUpdate(insertQuery);
+        Validator.verifyInteger(courseId);
+        Integer studentIdInt = Integer.parseInt(studentId);
+        Integer courseIdInt = Integer.parseInt(courseId);
+        try {
+            Connection conn = Connector.getConnection();
+            PreparedStatement stmt = conn
+                    .prepareStatement("DELETE FROM school.students_courses WHERE student_id = ? AND course_id = ? ;");
+            stmt.setInt(1, studentIdInt);
+            stmt.setInt(2, courseIdInt);
+            stmt.executeUpdate();
         } catch (SQLException e) {
             throw new SQLException(e);
         }
@@ -65,8 +70,10 @@ public class RemoverStudentFromTheCourse {
 
     private static void print(String query)
             throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
-        try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
-            ResultSet resultSet = stmt.executeQuery(query);
+        try {
+            Connection conn = Connector.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet resultSet = stmt.executeQuery();
             ResultSetMetaData rsmd = resultSet.getMetaData();
             int columnsNumber = rsmd.getColumnCount();
             while (resultSet.next()) {
@@ -85,16 +92,19 @@ public class RemoverStudentFromTheCourse {
         }
     }
 
-    private static void printCorsesPerStudent(String id)
+    private static void printCorsesPerStudent(String studentId)
             throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
-        Validator.verifyInteger(id);
-        try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
-            String query = "SELECT school.students_courses.course_id, course_name\n" + "FROM school.students\n"
-                    + "JOIN school.students_courses \n"
-                    + "ON  school.students_courses.student_id = school.students.student_id\n" + "JOIN school.courses\n"
+        Validator.verifyInteger(studentId);
+        Integer studentIdInt = Integer.parseInt(studentId);
+        try {
+            Connection conn = Connector.getConnection();
+            PreparedStatement stmt = conn.prepareStatement("SELECT school.students_courses.course_id, course_name\n"
+                    + "FROM school.students JOIN school.students_courses \n"
+                    + "ON  school.students_courses.student_id = school.students.student_id JOIN school.courses\n"
                     + "ON school.students_courses.course_id = school.courses.course_id\n"
-                    + "WHERE school.students_courses.student_id = " + id + " ORDER BY course_id;";
-            ResultSet resultSet = stmt.executeQuery(query);
+                    + "WHERE school.students_courses.student_id = ? ORDER BY course_id;");
+            stmt.setInt(1, studentIdInt);
+            ResultSet resultSet = stmt.executeQuery();
             ResultSetMetaData rsmd = resultSet.getMetaData();
             int columnsNumber = rsmd.getColumnCount();
             while (resultSet.next()) {
