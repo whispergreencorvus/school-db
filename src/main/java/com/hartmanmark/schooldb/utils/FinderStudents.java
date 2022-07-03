@@ -4,94 +4,87 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
-import com.hartmanmark.schooldb.output.ConsoleMenu;
 import com.hartmanmark.schooldb.validator.Validator;
 
 public class FinderStudents {
 
-    private static int numberOfStudents;
-    private static String nameOfColumns = "Last names:          First names:";
-    private static String separator = "-----------          -----------";
-    private static String exit = "For return input [exit]: ";
-    private static String enterCourse = "Enter the course (Chemistry, Biology, Physics, Astronomy, History, "
+    private Validator validator;
+    private int numberOfStudents;
+    private String course;
+    private String exit = "To return enter [exit]";
+    private String findedStudents = String.format("%100s", "").replace(' ', '-');
+    private String nameOfColumns = "Last names:     First names:";
+    private String separator = "-----------     -----------";
+    private String enterCourse = "Enter the course (Chemistry, Biology, Physics, Astronomy, History, "
             + "Anthropology, Geography, Mathematics, Philosophy, Linguistics)";
-    private static String studentsPerGroup = "SELECT school.students.last_name, school.students.first_name\n"
-            + "FROM school.students\n" + "JOIN school.students_courses\n"
-            + "ON school.students.student_id = school.students_courses.student_id \n" + "JOIN school.courses\n"
-            + "ON school.courses.course_id = school.students_courses.course_id \n"
+    private String studentsPerGroup = "SELECT school.students.last_name, school.students.first_name "
+            + "FROM school.students JOIN school.students_courses "
+            + "ON school.students.student_id = school.students_courses.student_id JOIN school.courses\n"
+            + "ON school.courses.course_id = school.students_courses.course_id "
             + "WHERE school.courses.course_name = '";
-    private static String countQuery = "SELECT count(*)\n" + "FROM school.students\n" + "JOIN school.students_courses\n"
-            + "ON school.students.student_id = school.students_courses.student_id \n" + "JOIN school.courses\n"
+    private String countQuery = "SELECT count(*) FROM school.students JOIN school.students_courses\n"
+            + "ON school.students.student_id = school.students_courses.student_id JOIN school.courses\n"
             + "ON school.courses.course_id = school.students_courses.course_id \n"
             + "WHERE school.courses.course_name = '";
 
-    public static void findStudents() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+    public void findStudents() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         Scanner scanner = new Scanner(System.in);
-        String course = null;
-        while (true) {
-            System.out.println(enterCourse + "\n" + exit);
-            course = scanner.nextLine();
-
-            if (course.equalsIgnoreCase("exit")) {
-                ConsoleMenu consoleMenu = new ConsoleMenu();
-                consoleMenu.runConsole();
-                scanner.close();
-                break;
-            }
-            try {
-                printStudents(course);
-            } catch (IllegalArgumentException e) {
-                System.err.println(e.getMessage());
-            }
+        System.out.println(enterCourse + "\n" + exit);
+        course = scanner.nextLine();
+        if (course.equalsIgnoreCase("exit")) {
+            return;
+        }
+        try {
+            setOuptut();
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
         }
     }
 
-    private static void printStudents(String course)
-            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
-        Validator.veryfyInputString(course);
-        try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
-            String insertQuery = studentsPerGroup + course + "'ORDER BY school.students.last_name;";
-            ResultSet resultSet = stmt.executeQuery(insertQuery);
-            ResultSetMetaData rsmd = resultSet.getMetaData();
-            int columnsNumber = rsmd.getColumnCount();
-            countOfStudents(course);
-            System.out.println(nameOfColumns + "\n" + separator);
+    private void setOuptut() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        validator.veryfyInputString(course);
+        StringBuilder builder = new StringBuilder();
+        try {
+            Connection conn = Connector.getConnection();
+            PreparedStatement stmt = conn
+                    .prepareStatement(studentsPerGroup + course + "'ORDER BY school.students.last_name;");
+            ResultSet resultSet = stmt.executeQuery();
+            countOfStudents();
+            builder.append(nameOfColumns + "\n" + separator + "\n");
             while (resultSet.next()) {
-                for (int i = 1; i <= columnsNumber; i++) {
-                    if (i > 1) {
-                        System.out.print(" ");
-                    }
-                    String columnValue = resultSet.getString(i);
-                    System.out.print(columnValue);
-                }
-                System.out.println("");
+                builder.append(resultSet.getString(1) + "     " + resultSet.getString(2) + "\n");
             }
-            System.out.println(separator + "\n" + "Students on the course: " + numberOfStudents);
+            builder.append(separator + "\nStudents on the course: " + numberOfStudents);
             resultSet.close();
         } catch (SQLException e) {
             throw new SQLException(e);
         }
+        setFindedStudents(builder.toString());
     }
 
-    private static void countOfStudents(String course)
-            throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
-        Integer numberOfStudents = null;
-        PreparedStatement statement = Connector.getConnection().prepareStatement(countQuery + course + "';");
-        ResultSet resultSet = statement.executeQuery();
+    private void countOfStudents() throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
+        Connection conn = Connector.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(countQuery + course + "';");
+        ResultSet resultSet = stmt.executeQuery();
         while (resultSet.next()) {
-            numberOfStudents = Integer.valueOf(resultSet.getString("count"));
+            numberOfStudents = resultSet.getInt(1);
         }
-        setNumberOfStudents(numberOfStudents);
     }
 
-    public static void setNumberOfStudents(int numberOfStudents) {
-        FinderStudents.numberOfStudents = numberOfStudents;
+    public FinderStudents(Validator validator) {
+        this.validator = validator;
+    }
+
+    public String getFindedStudents() {
+        return findedStudents;
+    }
+
+    public void setFindedStudents(String findedStudents) {
+        this.findedStudents = findedStudents;
     }
 }

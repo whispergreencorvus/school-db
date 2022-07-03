@@ -8,50 +8,42 @@ import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
-import com.hartmanmark.schooldb.output.ConsoleMenu;
 import com.hartmanmark.schooldb.validator.Validator;
 
 public class AdderStudentsToDataBase {
 
-    private static String firstNamePrint = "Please enter student first name: ";
-    private static String lastNamePrint = "Please enter student last name: ";
-    private static String exit = "For return input [exit]";
-    private static String creadedStudent = "A new student has been successfully added: ";
-    private static String addNext = "To add next student enter student first name: ";
+    private String firstNamePrint = "Please enter student first name: ";
+    private String lastNamePrint = "Please enter student last name: ";
+    private String creadedStudent = "A new student has been successfully added: ";
+    private String addedStudent = String.format("%100s", "").replace(' ', '-');
+    private String exit = "To return enter [exit]";
+    private Validator validator;
 
-    public static void add() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+    public void add() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         System.out.println(firstNamePrint + "\n" + exit);
         Scanner scanner = new Scanner(System.in);
         String firstName = null;
         String lastName = null;
-        while (true) {
-            firstName = scanner.nextLine();
-            if (firstName.equalsIgnoreCase("exit")) {
-                ConsoleMenu consoleMenu = new ConsoleMenu();
-                consoleMenu.runConsole();
-                scanner.close();
-                break;
-            }
-            System.out.println(lastNamePrint + "\n" + exit);
-            lastName = scanner.nextLine();
-            if (lastName.equalsIgnoreCase("exit")) {
-                ConsoleMenu consoleMenu = new ConsoleMenu();
-                consoleMenu.runConsole();
-                scanner.close();
-                break;
-            }
-            try {
-                addStudent(firstName, lastName);
-            } catch (IllegalArgumentException e) {
-                System.err.println(e.getMessage());
-            }
+        firstName = scanner.nextLine();
+        if (firstName.equalsIgnoreCase("exit")) {
+            return;
+        }
+        validator.veryfyInputString(firstName);
+        System.out.println(lastNamePrint);
+        lastName = scanner.nextLine();
+        if (lastName.equalsIgnoreCase("exit")) {
+            return;
+        }
+        validator.veryfyInputString(lastName);
+        try {
+            addStudent(firstName, lastName);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
         }
     }
 
-    private static void addStudent(String firstName, String lastName)
+    private void addStudent(String firstName, String lastName)
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        Validator.veryfyInputString(firstName);
-        Validator.veryfyInputString(lastName);
         try {
             Connection conn = Connector.getConnection();
             PreparedStatement stmt = conn
@@ -63,6 +55,18 @@ public class AdderStudentsToDataBase {
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        System.out.println(creadedStudent + "[" + firstName + " " + lastName + "]" + "\n" + addNext + "\n" + exit);
+        setAddedStudent("\n" + creadedStudent + "[" + firstName + " " + lastName + "]");
+    }
+
+    public AdderStudentsToDataBase(Validator validator) {
+        this.validator = validator;
+    }
+
+    public String getAddedStudent() {
+        return addedStudent;
+    }
+
+    public void setAddedStudent(String student) {
+        this.addedStudent = student;
     }
 }

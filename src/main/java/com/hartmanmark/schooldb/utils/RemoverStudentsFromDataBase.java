@@ -9,38 +9,36 @@ import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
-import com.hartmanmark.schooldb.output.ConsoleMenu;
 import com.hartmanmark.schooldb.validator.Validator;
 
 public class RemoverStudentsFromDataBase {
 
-    private static String removeStudent = "Please enter an student ID between 1 and ";
-    private static String exit = "For return input [exit]";
-    private static String removeNextStudent = "To remove next student, enter an student ID between 1 and ";
+    private String removeStudent = "Please enter an student ID between 1 and ";
+    private String exit = "For return input [exit]";
+    private String removedStudent;
+    private String numberOfStudents;
+    private Validator validator;
 
-    public static void remove() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        System.out.println(removeStudent + numberOfIdStudents() + "\n" + exit);
+    public void remove() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+        numberOfIdStudents();
+        System.out.println(removeStudent + getNumberOfStudents() + "\n" + exit);
         Scanner scanner = new Scanner(System.in);
         String studentId;
-        while (true) {
-            studentId = scanner.nextLine();
-            if (studentId.equalsIgnoreCase("exit")) {
-                ConsoleMenu consoleMenu = new ConsoleMenu();
-                consoleMenu.runConsole();
-                scanner.close();
-                break;
-            }
-            try {
-                removeStudent(studentId);
-            } catch (IllegalArgumentException e) {
-                System.err.println(e.getMessage());
-            }
+        studentId = scanner.nextLine();
+        if (studentId.equalsIgnoreCase("exit")) {
+            setRemovedStudent(String.format("%100s", "").replace(' ', '-'));
+            return;
+        }
+        try {
+            removeStudent(studentId);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
         }
     }
 
-    private static void removeStudent(String studentId)
+    private void removeStudent(String studentId)
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        Validator.veryfyRemoveOption(studentId);
+        validator.veryfyRemoveOption(studentId, getNumberOfStudents());
         Integer studentIdInt = Integer.parseInt(studentId);
         try {
             Connection conn = Connector.getConnection();
@@ -50,11 +48,10 @@ public class RemoverStudentsFromDataBase {
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        System.out.println("Student by ID = [" + studentId + "] removed");
-        System.out.println(removeNextStudent + numberOfIdStudents() + "\n" + exit);
+        setRemovedStudent("Student by ID = [" + studentId + "] removed");
     }
 
-    public static int numberOfIdStudents()
+    public void numberOfIdStudents()
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         Integer numberOfStudents = null;
         Connection conn = Connector.getConnection();
@@ -64,6 +61,26 @@ public class RemoverStudentsFromDataBase {
             numberOfStudents = Integer.valueOf(resultSet.getString("count"));
         }
         resultSet.close();
+        setNumberOfStudents(numberOfStudents.toString());
+    }
+
+    public RemoverStudentsFromDataBase(Validator validator) {
+        this.validator = validator;
+    }
+
+    public String getNumberOfStudents() {
         return numberOfStudents;
+    }
+
+    public void setNumberOfStudents(String numberOfStudents) {
+        this.numberOfStudents = numberOfStudents;
+    }
+
+    public String getRemovedStudent() {
+        return removedStudent;
+    }
+
+    public void setRemovedStudent(String output) {
+        this.removedStudent = output;
     }
 }

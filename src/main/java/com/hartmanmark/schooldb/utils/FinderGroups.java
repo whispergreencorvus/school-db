@@ -5,11 +5,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
-import com.hartmanmark.schooldb.output.ConsoleMenu;
 
 public class FinderGroups {
 
@@ -19,39 +17,20 @@ public class FinderGroups {
             + "count_, ROW_NUMBER() OVER( PARTITION BY count_ ORDER BY group_name) "
             + "AS rn FROM tab) SELECT * FROM tab WHERE count_ IN (SELECT count_ FROM cte WHERE rn = 2) "
             + "ORDER BY count_;";
-    private String exit = "For return input [exit]";
+    private String exit = "\n Groups:        Students:\n";
+    private String separator = "  -----            --";
 
-    public String findGroups() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        Scanner scanner = new Scanner(System.in);
-        String course = null;
-        String str = null;
-        while (true) {
-            try {
-                str = printGroups();
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException(e);
-            }
-            course = scanner.nextLine();
-            if (course.equalsIgnoreCase("exit")) {
-                ConsoleMenu consoleMenu = new ConsoleMenu();
-                consoleMenu.runConsole();
-                scanner.close();
-                break;
-            }
-        }
-        return str;
-    }
-
-    private String printGroups() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+    public String findGroups() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
         StringBuilder builder = new StringBuilder();
         try {
             Connection conn = Connector.getConnection();
             PreparedStatement stmt = conn.prepareStatement(query);
             ResultSet resultSet = stmt.executeQuery();
-            while (resultSet.next()) {
-                builder.append(resultSet.getString(1) + "   " + resultSet.getString(2) + "\n");
-            }
             builder.append(exit);
+            while (resultSet.next()) {
+                builder.append("  " + resultSet.getString(1) + "            " + resultSet.getString(2) + "\n");
+            }
+            builder.append(separator);
             resultSet.close();
         } catch (SQLException e) {
             throw new SQLException(e);

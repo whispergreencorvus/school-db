@@ -6,8 +6,8 @@ CREATE SCHEMA school;
 CREATE TABLE school.students(
     STUDENT_ID smallint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     GROUP_ID smallint,
-    FIRST_NAME char(20),
-    LAST_NAME char(20)
+    FIRST_NAME char(11),
+    LAST_NAME char(11)
     );
 
 CREATE TABLE school.courses(

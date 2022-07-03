@@ -4,16 +4,14 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
-import com.hartmanmark.schooldb.utils.RemoverStudentsFromDataBase;
 
 public class Validator {
 
-    private static final String REGEX_MENU = "[^w^[1-7]]+";
-    private static final String REGEX_INTEGER = "[^w^[0-9]]+";
-    private static final String REGEX_STRING = "[^wd^[a-zA-Z]]+";
+    private final String REGEX_MENU = "[^w^[1-7]]+";
+    private final String REGEX_INTEGER = "[^w^[0-9]]+";
+    private final String REGEX_STRING = "[^wd^[a-zA-Z]]+";
 
-
-    public static void verifyMenuChoose(String input) {
+    public void verifyMenuChoose(String input) {
         if (input == null) {
             throw new IllegalArgumentException("Input data is null");
         }
@@ -28,7 +26,7 @@ public class Validator {
         }
     }
 
-    public static void verifyInteger(String input) {
+    public void verifyInteger(String input) {
         if (input == null) {
             throw new IllegalArgumentException("Input data is null");
         }
@@ -40,7 +38,7 @@ public class Validator {
         }
     }
 
-    public static void veryfyRemoveOption(String input)
+    public void veryfyRemoveOption(String input, String numberOfStudents)
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         if (input == null) {
             throw new IllegalArgumentException("Input data is null");
@@ -52,13 +50,13 @@ public class Validator {
             throw new IllegalArgumentException("Please enter an integer value. Try again.");
         }
         int inputID = Integer.parseInt(input);
-        int numberOfStudents = RemoverStudentsFromDataBase.numberOfIdStudents();
-        if (inputID > numberOfStudents) {
+        Integer numOfStudentsInt = Integer.parseInt(numberOfStudents);
+        if (inputID > numOfStudentsInt) {
             throw new IllegalArgumentException("Please enter an integer value between 1 and " + numberOfStudents);
         }
     }
 
-    public static void veryfyInputString(String input) {
+    public void veryfyInputString(String input) {
         if (input == null) {
             throw new IllegalArgumentException("Input data is null");
         }

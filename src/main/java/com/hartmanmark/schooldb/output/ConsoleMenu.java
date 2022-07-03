@@ -11,6 +11,7 @@ import com.hartmanmark.schooldb.utils.FinderGroups;
 import com.hartmanmark.schooldb.utils.FinderStudents;
 import com.hartmanmark.schooldb.utils.RemoverStudentsFromDataBase;
 import com.hartmanmark.schooldb.utils.RemoverStudentFromTheCourse;
+import com.hartmanmark.schooldb.utils.RemoverStudentFromTheCourse2;
 import com.hartmanmark.schooldb.validator.Validator;
 
 public class ConsoleMenu {
@@ -21,42 +22,51 @@ public class ConsoleMenu {
             "4 - Delete student by STUDENT_ID", "5 - Add a student to the course (from a list)",
             "6 - Remove the student from one of his or her courses", "7 - Exit", "" };
     private final String welcom = "Welcom to simple sql-jdbc-school app.";
-    private final String redLine = String.format("%100s", "").replace(' ', '-') + "\n";
-    FinderGroups finderGroups = new FinderGroups();
+    private final String separator = String.format("%100s", "").replace(' ', '-') + "\n";
+    private Validator validator = new Validator();
+    private FinderGroups finderGroups = new FinderGroups();
+    private FinderStudents finderStudents = new FinderStudents(validator);
+    private AdderStudentsToDataBase adderStudentsToDataBase = new AdderStudentsToDataBase(validator);
+    private AdderStudentsToTheCourse adderStudentsToTheCourse = new AdderStudentsToTheCourse(validator);
+    private RemoverStudentsFromDataBase removerStudentsFromDataBase = new RemoverStudentsFromDataBase(validator);
+    private RemoverStudentFromTheCourse removerStudentFromTheCourse = new RemoverStudentFromTheCourse(validator);
+//    private RemoverStudentFromTheCourse2 removerStudentFromTheCourse2 = new RemoverStudentFromTheCourse2(validator);
 
     public void runConsole() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        System.err.println(redLine);
-        System.out.print(welcom);
+        System.out.print(separator + "\n" + welcom);
         while (true) {
             try {
                 printMenu(options);
                 Scanner scanner = new Scanner(System.in);
                 input = scanner.nextLine();
-                Validator.verifyMenuChoose(input);
+                validator.verifyMenuChoose(input);
                 if (input.equals("1")) {
-
                     System.out.println(finderGroups.findGroups());
-                    break;
                 } else if (input.equals("2")) {
-                    FinderStudents.findStudents();
-                    break;
+                    finderStudents.findStudents();
+                    System.out.println(finderStudents.getFindedStudents());
                 } else if (input.equals("3")) {
-                    AdderStudentsToDataBase.add();
-                    break;
+                    adderStudentsToDataBase.add();
+                    System.out.println(adderStudentsToDataBase.getAddedStudent());
                 } else if (input.equals("4")) {
-                    RemoverStudentsFromDataBase.remove();
-                    break;
+                    removerStudentsFromDataBase.remove();
+                    System.out.println(removerStudentsFromDataBase.getRemovedStudent());
                 } else if (input.equals("5")) {
-                    AdderStudentsToTheCourse.add();
-                    break;
+                    adderStudentsToTheCourse.add();
+                    System.out.println(adderStudentsToTheCourse.getResult());
+//                } else if (input.equals("6")) {
+//                    removerStudentFromTheCourse2.setStudentsToPrint();
+//                    System.out.println(removerStudentFromTheCourse2.getStudents());
+//                    removerStudentFromTheCourse2.setStudentId();
+//                    System.out.println(removerStudentFromTheCourse2.getCourses());
+//                    removerStudentFromTheCourse2.setCourseToRemove();
+//                    System.out.println("getResult");
                 } else if (input.equals("6")) {
-                    RemoverStudentFromTheCourse.remove();
-                    break;
+                    removerStudentFromTheCourse.remove();
                 } else if (input.equals("7")) {
-                    System.err.println("Exit");
+                    System.out.println("Exit");
                     break;
                 }
-                scanner.close();
             } catch (IllegalArgumentException e) {
                 System.err.println(e.getMessage());
             }

@@ -11,33 +11,34 @@ import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.validator.Validator;
 
-public class RemoverStudentFromTheCourse {
+public class RemoverStudentFromTheCourse2 {
 
     private String studentIdPrint = "Please enter student ID: ";
     private String coursePrint = "Please enter number of the course: ";
-    private String exit = "For return input [exit]";
     private String studentsQuery = "SELECT student_id, first_name, last_name FROM school.students ORDER BY student_id ;";
     private Validator validator;
+    private String students;
+    private String courses;
+    private String studentId;
+    private String courseId;
 
-    public void remove() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+    public void setStudentsToPrint()
+            throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+        setStudents("\n" + printStudents(studentsQuery) + "\n" + studentIdPrint + "\n");
+    }
+
+    public void setStudentId()
+            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
         Scanner scanner = new Scanner(System.in);
-        String studentId = null;
-        String course = null;
-        System.out.println(printStudents(studentsQuery) + "\n" + studentIdPrint + "\n" + exit);
         studentId = scanner.nextLine();
-        if (studentId.equalsIgnoreCase("exit")) {
-            return;
-        }
-        System.out.println(printCorsesPerStudent(studentId) + "\n" + coursePrint + "\n" + exit);
-        course = scanner.nextLine();
-        if (course.equalsIgnoreCase("exit")) {
-            return;
-        }
-        try {
-            removeStudent(studentId, course);
-        } catch (IllegalArgumentException e) {
-            System.err.println(e.getMessage());
-        }
+        setCourses("\n" + printCorsesPerStudent(studentId) + "\n" + coursePrint + "\n");
+    }
+
+    public void setCourseToRemove()
+            throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+        Scanner scanner = new Scanner(System.in);
+        courseId = scanner.nextLine();
+        removeStudent(studentId, courseId);
     }
 
     private void removeStudent(String studentId, String courseId)
@@ -99,7 +100,23 @@ public class RemoverStudentFromTheCourse {
         return builder.toString();
     }
 
-    public RemoverStudentFromTheCourse(Validator validator) {
+    public RemoverStudentFromTheCourse2(Validator validator) {
         this.validator = validator;
+    }
+
+    public String getCourses() {
+        return courses;
+    }
+
+    public void setCourses(String courses) {
+        this.courses = courses;
+    }
+
+    public String getStudents() {
+        return students;
+    }
+
+    public void setStudents(String students) {
+        this.students = students;
     }
 }

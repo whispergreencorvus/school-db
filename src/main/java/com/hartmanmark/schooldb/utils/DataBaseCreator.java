@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
-
 import org.apache.ibatis.jdbc.ScriptRunner;
 
 import com.hartmanmark.schooldb.dao.Connector;
@@ -21,7 +20,8 @@ public class DataBaseCreator {
     }
 
     private BufferedReader readSQLFile() throws ClassNotFoundException, IOException, SQLException {
-        BufferedReader readerSchema = new BufferedReader(new FileReader(Reader.readPathProperties("pathToShemaSQLFile")));
+        BufferedReader readerSchema = new BufferedReader(
+                new FileReader(Reader.readPathProperties("pathToShemaSQLFile")));
         return readerSchema;
     }
 }
