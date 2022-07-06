@@ -36,19 +36,18 @@ public class AdderStudentsToDataBase {
         }
         validator.veryfyInputString(lastName);
         try {
-            addStudent(firstName, lastName);
+            addStudentToDataBase(firstName, lastName);
         } catch (IllegalArgumentException e) {
-            System.err.println(e.getMessage());
+            throw new IllegalArgumentException(e);
         }
     }
 
-    private void addStudent(String firstName, String lastName)
+    private void addStudentToDataBase(String firstName, String lastName)
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        try {
-            Connection conn = Connector.getConnection();
-            PreparedStatement stmt = conn
-                    .prepareStatement("INSERT INTO school.students (STUDENT_ID, GROUP_ID, FIRST_NAME, LAST_NAME)"
-                            + " VALUES (DEFAULT, NULL,?,?);");
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn
+                        .prepareStatement("INSERT INTO school.students (STUDENT_ID, GROUP_ID, FIRST_NAME, LAST_NAME)"
+                                + " VALUES (DEFAULT, NULL,?,?);")) {
             stmt.setString(1, firstName);
             stmt.setString(2, lastName);
             stmt.executeUpdate();

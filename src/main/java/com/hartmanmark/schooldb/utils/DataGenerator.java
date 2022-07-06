@@ -38,10 +38,14 @@ public class DataGenerator {
     private void countOfStudents() throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
         String countStudentsQuery = "SELECT count(*) from school.students;";
         Integer numberOfStudents = null;
-        PreparedStatement statement = Connector.getConnection().prepareStatement(countStudentsQuery);
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            numberOfStudents = Integer.valueOf(resultSet.getString("count"));
+        try (PreparedStatement statement = Connector.getConnection().prepareStatement(countStudentsQuery)) {
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    numberOfStudents = Integer.valueOf(resultSet.getString("count"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLException(e);
         }
         setNumberOfStudents(numberOfStudents);
     }
@@ -78,11 +82,11 @@ public class DataGenerator {
 
     private void getListOfRandomFirstNames(File pathToFirstNames)
             throws IOException, ClassNotFoundException, SQLException {
-        Scanner scannerFirstName = new Scanner(pathToFirstNames);
-        while (scannerFirstName.hasNextLine()) {
-            randomFirstName.add(scannerFirstName.nextLine());
+        try (Scanner scannerFirstName = new Scanner(pathToFirstNames)) {
+            while (scannerFirstName.hasNextLine()) {
+                randomFirstName.add(scannerFirstName.nextLine());
+            }
         }
-        scannerFirstName.close();
     }
 
     private void putStudentsInOneGroup(int idGroup)
@@ -102,11 +106,11 @@ public class DataGenerator {
     }
 
     private void getListOfRandomLastNames(File pathToLastNames) throws IOException {
-        Scanner scannerLastName = new Scanner(pathToLastNames);
-        while (scannerLastName.hasNextLine()) {
-            randomLastName.add(scannerLastName.nextLine());
+        try (Scanner scannerLastName = new Scanner(pathToLastNames)) {
+            while (scannerLastName.hasNextLine()) {
+                randomLastName.add(scannerLastName.nextLine());
+            }
         }
-        scannerLastName.close();
     }
 
     public int getNumberOfStudents() {

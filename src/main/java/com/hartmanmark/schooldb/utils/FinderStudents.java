@@ -32,7 +32,7 @@ public class FinderStudents {
             + "ON school.courses.course_id = school.students_courses.course_id \n"
             + "WHERE school.courses.course_name = '";
 
-    public void findStudents() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+    public void find() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         Scanner scanner = new Scanner(System.in);
         System.out.println(enterCourse + "\n" + exit);
         course = scanner.nextLine();
@@ -40,27 +40,26 @@ public class FinderStudents {
             return;
         }
         try {
-            setOuptut();
+            findStudents();
         } catch (IllegalArgumentException e) {
-            System.err.println(e.getMessage());
+            throw new IllegalArgumentException(e);
         }
     }
 
-    private void setOuptut() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+    private void findStudents() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
         validator.veryfyInputString(course);
         StringBuilder builder = new StringBuilder();
-        try {
-            Connection conn = Connector.getConnection();
-            PreparedStatement stmt = conn
-                    .prepareStatement(studentsPerGroup + course + "'ORDER BY school.students.last_name;");
-            ResultSet resultSet = stmt.executeQuery();
-            countOfStudents();
-            builder.append(nameOfColumns + "\n" + separator + "\n");
-            while (resultSet.next()) {
-                builder.append(resultSet.getString(1) + "     " + resultSet.getString(2) + "\n");
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn
+                        .prepareStatement(studentsPerGroup + course + "'ORDER BY school.students.last_name;")) {
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                countOfStudents();
+                builder.append(nameOfColumns + "\n" + separator + "\n");
+                while (resultSet.next()) {
+                    builder.append(resultSet.getString(1) + "     " + resultSet.getString(2) + "\n");
+                }
+                builder.append(separator + "\nStudents on the course: " + numberOfStudents);
             }
-            builder.append(separator + "\nStudents on the course: " + numberOfStudents);
-            resultSet.close();
         } catch (SQLException e) {
             throw new SQLException(e);
         }
@@ -68,11 +67,15 @@ public class FinderStudents {
     }
 
     private void countOfStudents() throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
-        Connection conn = Connector.getConnection();
-        PreparedStatement stmt = conn.prepareStatement(countQuery + course + "';");
-        ResultSet resultSet = stmt.executeQuery();
-        while (resultSet.next()) {
-            numberOfStudents = resultSet.getInt(1);
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(countQuery + course + "';")) {
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    numberOfStudents = resultSet.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLException(e);
         }
     }
 

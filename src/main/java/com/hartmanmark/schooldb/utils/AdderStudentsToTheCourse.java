@@ -19,42 +19,45 @@ public class AdderStudentsToTheCourse {
     private String studentsQuery = "SELECT student_id, first_name, last_name FROM school.students ORDER BY student_id ;";
     private String outputStudentQuery = "SELECT school.students.first_name, school.students.last_name FROM school.students WHERE school.students.student_id = ";
     private String outputCourseQuery = "SELECT school.courses.course_name FROM school.courses WHERE school.courses.course_id = ";
+    private String separator = String.format("%100s", "").replace(' ', '-');
     private Validator validator;
-    private String result = String.format("%100s", "").replace(' ', '-');
+    private String result;
     private String course;
+    private String studentId;
+    private String courseId;
 
     public void add() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         Scanner scanner = new Scanner(System.in);
-        String studentId = null;
-        String courseId = null;
-        System.out.println(printStudents(studentsQuery) + studentIdPrint);
+        System.out.println(createStudentsListToPrint(studentsQuery) + studentIdPrint);
         studentId = scanner.nextLine();
         if (studentId.equalsIgnoreCase("exit")) {
+            setResult(separator);
             return;
         }
-        getAddedStuden(studentId);
-        System.out.println(printCourses(courseQuery) + coursePrint);
+        System.out.println(createCourseListToPrint(courseQuery) + coursePrint);
         courseId = scanner.nextLine();
         if (courseId.equalsIgnoreCase("exit")) {
+            setResult(separator);
             return;
         }
+        findAddedCourse();
+        findAddedStuden();
         try {
-            addStudent(studentId, courseId);
+            addStudentToTheCourse();
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    private void addStudent(String studentId, String courseId)
+    private void addStudentToTheCourse()
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         validator.verifyInteger(studentId);
         validator.verifyInteger(courseId);
         Integer studentIdInt = Integer.parseInt(studentId);
         Integer courseIdInt = Integer.parseInt(courseId);
-        try {
-            Connection conn = Connector.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO school.students_courses (id, student_id, course_id) VALUES (DEFAULT, ? , ? );");
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "INSERT INTO school.students_courses (id, student_id, course_id) VALUES (DEFAULT, ? , ? );")) {
             stmt.setInt(1, studentIdInt);
             stmt.setInt(2, courseIdInt);
             stmt.executeUpdate();
@@ -63,79 +66,62 @@ public class AdderStudentsToTheCourse {
         }
     }
 
-    private String printStudents(String query)
+    private String createStudentsListToPrint(String query)
             throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
         StringBuilder builder = new StringBuilder();
-        try {
-            Connection conn = Connector.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query);
-            ResultSet resultSet = stmt.executeQuery();
-            while (resultSet.next()) {
-                builder.append(
-                        resultSet.getString(1) + " " + resultSet.getString(2) + " " + resultSet.getString(3) + "\n");
+        try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    builder.append(resultSet.getString(1) + " " + resultSet.getString(2) + " " + resultSet.getString(3)
+                            + "\n");
+                }
             }
-            resultSet.close();
         } catch (SQLException e) {
             throw new SQLException(e);
         }
         return builder.toString();
     }
 
-    private String printCourses(String query)
+    private String createCourseListToPrint(String query)
             throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
         StringBuilder builder = new StringBuilder();
-        try {
-            Connection conn = Connector.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query);
-            ResultSet resultSet = stmt.executeQuery();
-            while (resultSet.next()) {
-                builder.append(resultSet.getString(1) + " " + resultSet.getString(2) + "\n");
+        try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    builder.append(resultSet.getString(1) + " " + resultSet.getString(2) + "\n");
+                }
             }
-            resultSet.close();
         } catch (SQLException e) {
             throw new SQLException(e);
         }
         return builder.toString();
     }
 
-    private void getAddedStuden(String studentId)
-            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
-        getAddedCourse(studentId);
-        try {
-            Connection conn = Connector.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(outputStudentQuery + studentId + ";");
-            ResultSet resultSet = stmt.executeQuery();
-            while (resultSet.next()) {
-                setResult("Student: " + resultSet.getString(1) + " " + resultSet.getString(2)
-                        + "\nwas succesefully added to the: " + getCourse());
+    private void findAddedStuden() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(outputStudentQuery + studentId + ";")) {
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    setResult("Student: " + resultSet.getString(1) + " " + resultSet.getString(2)
+                            + "\nwas succesefully added to the: " + course);
+                }
             }
-            resultSet.close();
         } catch (SQLException e) {
             throw new SQLException(e);
         }
     }
 
-    private void getAddedCourse(String courseId)
-            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
-        try {
-            Connection conn = Connector.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(outputCourseQuery + courseId + ";");
-            ResultSet resultSet = stmt.executeQuery();
-            while (resultSet.next()) {
-                setCourse(resultSet.getString(1));
+    private void findAddedCourse() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(outputCourseQuery + courseId + ";")) {
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    course = resultSet.getString(1);
+                }
             }
-            resultSet.close();
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-    }
-
-    public String getCourse() {
-        return course;
-    }
-
-    public void setCourse(String course) {
-        this.course = course;
     }
 
     public String getResult() {

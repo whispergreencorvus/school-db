@@ -9,9 +9,8 @@ import com.hartmanmark.schooldb.utils.AdderStudentsToDataBase;
 import com.hartmanmark.schooldb.utils.AdderStudentsToTheCourse;
 import com.hartmanmark.schooldb.utils.FinderGroups;
 import com.hartmanmark.schooldb.utils.FinderStudents;
-import com.hartmanmark.schooldb.utils.RemoverStudentsFromDataBase;
 import com.hartmanmark.schooldb.utils.RemoverStudentFromTheCourse;
-import com.hartmanmark.schooldb.utils.RemoverStudentFromTheCourse2;
+import com.hartmanmark.schooldb.utils.RemoverStudentsFromDataBase;
 import com.hartmanmark.schooldb.validator.Validator;
 
 public class ConsoleMenu {
@@ -30,7 +29,6 @@ public class ConsoleMenu {
     private AdderStudentsToTheCourse adderStudentsToTheCourse = new AdderStudentsToTheCourse(validator);
     private RemoverStudentsFromDataBase removerStudentsFromDataBase = new RemoverStudentsFromDataBase(validator);
     private RemoverStudentFromTheCourse removerStudentFromTheCourse = new RemoverStudentFromTheCourse(validator);
-//    private RemoverStudentFromTheCourse2 removerStudentFromTheCourse2 = new RemoverStudentFromTheCourse2(validator);
 
     public void runConsole() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         System.out.print(separator + "\n" + welcom);
@@ -43,32 +41,26 @@ public class ConsoleMenu {
                 if (input.equals("1")) {
                     System.out.println(finderGroups.findGroups());
                 } else if (input.equals("2")) {
-                    finderStudents.findStudents();
+                    finderStudents.find();
                     System.out.println(finderStudents.getFindedStudents());
                 } else if (input.equals("3")) {
                     adderStudentsToDataBase.add();
                     System.out.println(adderStudentsToDataBase.getAddedStudent());
                 } else if (input.equals("4")) {
                     removerStudentsFromDataBase.remove();
-                    System.out.println(removerStudentsFromDataBase.getRemovedStudent());
+                    System.out.println(removerStudentsFromDataBase.getResult());
                 } else if (input.equals("5")) {
                     adderStudentsToTheCourse.add();
                     System.out.println(adderStudentsToTheCourse.getResult());
-//                } else if (input.equals("6")) {
-//                    removerStudentFromTheCourse2.setStudentsToPrint();
-//                    System.out.println(removerStudentFromTheCourse2.getStudents());
-//                    removerStudentFromTheCourse2.setStudentId();
-//                    System.out.println(removerStudentFromTheCourse2.getCourses());
-//                    removerStudentFromTheCourse2.setCourseToRemove();
-//                    System.out.println("getResult");
                 } else if (input.equals("6")) {
                     removerStudentFromTheCourse.remove();
+                    System.out.println(removerStudentFromTheCourse.getResult());
                 } else if (input.equals("7")) {
                     System.out.println("Exit");
                     break;
                 }
             } catch (IllegalArgumentException e) {
-                System.err.println(e.getMessage());
+                throw new IllegalArgumentException(e);
             }
         }
     }

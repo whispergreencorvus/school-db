@@ -11,6 +11,7 @@ import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.service.Reader;
 
 public class DataBaseCreator {
+
     private Reader reader = new Reader();
 
     public void createDataBase() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {

@@ -26,10 +26,9 @@ public class DataInserter {
 
     public void insertGroups(String groupName)
             throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
-        try {
-            Connection conn = Connector.getConnection();
-            PreparedStatement stmt = conn
-                    .prepareStatement("INSERT INTO school.groups(GROUP_ID, GROUP_NAME) VALUES (DEFAULT , ?);");
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn
+                        .prepareStatement("INSERT INTO school.groups(GROUP_ID, GROUP_NAME) VALUES (DEFAULT , ?);")) {
             stmt.setString(1, groupName);
             stmt.executeUpdate();
         } catch (SQLException e) {

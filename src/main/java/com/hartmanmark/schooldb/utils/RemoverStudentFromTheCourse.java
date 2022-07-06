@@ -13,42 +13,78 @@ import com.hartmanmark.schooldb.validator.Validator;
 
 public class RemoverStudentFromTheCourse {
 
-    private String studentIdPrint = "Please enter student ID: ";
-    private String coursePrint = "Please enter number of the course: ";
-    private String exit = "For return input [exit]";
-    private String studentsQuery = "SELECT student_id, first_name, last_name FROM school.students ORDER BY student_id ;";
+    private String enterStudentId = "Please enter student ID: ";
+    private String enterCourseId = "Please enter number of the course: ";
+    private String selectStudentsQuery = "SELECT student_id, first_name, last_name FROM school.students ORDER BY student_id ;";
+    private String selectCourseQuery = "SELECT school.courses.course_name FROM school.courses WHERE school.courses.course_id = ";
+    private String selectStudentQuery = "SELECT school.students.first_name, school.students.last_name FROM school.students WHERE school.students.student_id = ";
+    private String separator = String.format("%100s", "").replace(' ', '-');
+    private String exit = "To return enter [exit]";
+    private String studentId;
+    private String courseId;
+    private String removedCourse;
+    private String studentWithRemovedCourse;
+    private String result;
     private Validator validator;
 
     public void remove() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        Scanner scanner = new Scanner(System.in);
-        String studentId = null;
-        String course = null;
-        System.out.println(printStudents(studentsQuery) + "\n" + studentIdPrint + "\n" + exit);
-        studentId = scanner.nextLine();
+        System.out.println(
+                "\n" + createStudentsListToPrint(selectStudentsQuery) + "\n" + enterStudentId + "\n" + exit + "\n");
+        Scanner scannerStudentId = new Scanner(System.in);
+        studentId = scannerStudentId.nextLine();
         if (studentId.equalsIgnoreCase("exit")) {
+            setResult(separator);
             return;
         }
-        System.out.println(printCorsesPerStudent(studentId) + "\n" + coursePrint + "\n" + exit);
-        course = scanner.nextLine();
-        if (course.equalsIgnoreCase("exit")) {
+        System.out.println("\n" + createCorsesPerStudentListToPrint(studentId) + "\n" + enterCourseId + "\n");
+        Scanner scannerCourseId = new Scanner(System.in);
+        courseId = scannerCourseId.nextLine();
+        if (courseId.equalsIgnoreCase("exit")) {
+            setResult(separator);
             return;
         }
-        try {
-            removeStudent(studentId, course);
-        } catch (IllegalArgumentException e) {
-            System.err.println(e.getMessage());
+        removeStudentFromTheCourse(studentId, courseId);
+        findRemovedCourse();
+        findStudentWithRemovedCourse();
+        setResult("Student " + studentWithRemovedCourse + "\nwas succesfully removed from course: " + removedCourse);
+    }
+
+    private void findRemovedCourse()
+            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(selectCourseQuery + courseId + ";")) {
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    removedCourse = resultSet.getString(1);
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLException(e);
         }
     }
 
-    private void removeStudent(String studentId, String courseId)
+    private void findStudentWithRemovedCourse()
+            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(selectStudentQuery + studentId + ";")) {
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    studentWithRemovedCourse = resultSet.getString(1) + resultSet.getString(2);
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        }
+    }
+
+    private void removeStudentFromTheCourse(String studentId, String courseId)
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
         validator.verifyInteger(courseId);
         Integer studentIdInt = Integer.parseInt(studentId);
         Integer courseIdInt = Integer.parseInt(courseId);
-        try {
-            Connection conn = Connector.getConnection();
-            PreparedStatement stmt = conn
-                    .prepareStatement("DELETE FROM school.students_courses WHERE student_id = ? AND course_id = ? ;");
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "DELETE FROM school.students_courses WHERE student_id = ? AND course_id = ? ;")) {
             stmt.setInt(1, studentIdInt);
             stmt.setInt(2, courseIdInt);
             stmt.executeUpdate();
@@ -57,42 +93,39 @@ public class RemoverStudentFromTheCourse {
         }
     }
 
-    private String printStudents(String query)
+    private String createStudentsListToPrint(String query)
             throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
         StringBuilder builder = new StringBuilder();
-        try {
-            Connection conn = Connector.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query);
-            ResultSet resultSet = stmt.executeQuery();
-            while (resultSet.next()) {
-                builder.append(
-                        "\n" + resultSet.getInt(1) + " " + resultSet.getString(2) + " " + resultSet.getString(3));
+        try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    builder.append(
+                            "\n" + resultSet.getInt(1) + " " + resultSet.getString(2) + " " + resultSet.getString(3));
+                }
             }
-            resultSet.close();
         } catch (SQLException e) {
             throw new SQLException(e);
         }
         return builder.toString();
     }
 
-    private String printCorsesPerStudent(String studentId)
+    private String createCorsesPerStudentListToPrint(String studentId)
             throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
         validator.verifyInteger(studentId);
         Integer studentIdInt = Integer.parseInt(studentId);
         StringBuilder builder = new StringBuilder();
-        try {
-            Connection conn = Connector.getConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT school.students_courses.course_id, course_name\n"
-                    + "FROM school.students JOIN school.students_courses \n"
-                    + "ON  school.students_courses.student_id = school.students.student_id JOIN school.courses\n"
-                    + "ON school.students_courses.course_id = school.courses.course_id\n"
-                    + "WHERE school.students_courses.student_id = ? ORDER BY course_id;");
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn.prepareStatement("SELECT school.students_courses.course_id, course_name\n"
+                        + "FROM school.students JOIN school.students_courses \n"
+                        + "ON  school.students_courses.student_id = school.students.student_id JOIN school.courses\n"
+                        + "ON school.students_courses.course_id = school.courses.course_id\n"
+                        + "WHERE school.students_courses.student_id = ? ORDER BY course_id;")) {
             stmt.setInt(1, studentIdInt);
-            ResultSet resultSet = stmt.executeQuery();
-            while (resultSet.next()) {
-                builder.append("\n" + resultSet.getInt(1) + " " + resultSet.getString(2));
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    builder.append("\n" + resultSet.getInt(1) + " " + resultSet.getString(2));
+                }
             }
-            resultSet.close();
         } catch (SQLException e) {
             throw new SQLException(e);
         }
@@ -101,5 +134,13 @@ public class RemoverStudentFromTheCourse {
 
     public RemoverStudentFromTheCourse(Validator validator) {
         this.validator = validator;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 }

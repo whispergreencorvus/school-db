@@ -34,8 +34,11 @@ public class StudentDao {
             String s = "UPDATE school.students_courses SET COURSE_ID = " + rangeOfCourse + " WHERE ID = " + i + ";";
             string.append(s);
         }
-        PreparedStatement statement = Connector.getConnection().prepareStatement(string.toString());
-        statement.execute();
+        try (PreparedStatement statement = Connector.getConnection().prepareStatement(string.toString())) {
+            statement.execute();
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        }
     }
 
     private void createStudents() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
@@ -50,43 +53,39 @@ public class StudentDao {
                 stringBuilder.append(str);
             }
         }
-        PreparedStatement statement = Connector.getConnection().prepareStatement(stringBuilder.toString());
-        statement.execute();
+        try (PreparedStatement statement = Connector.getConnection().prepareStatement(stringBuilder.toString())) {
+            statement.execute();
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        }
     }
 
     private int countOfStudents() throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
         String str = "SELECT count(*) from school.students;";
-        try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(str);) {
-            Integer numberOfStudents = null;
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                numberOfStudents = Integer.valueOf(rs.getString("count"));
+        try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(str)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    numberOfStudents = Integer.valueOf(rs.getString("count"));
+                }
             }
-            setNumberOfStudents(numberOfStudents);
-            return numberOfStudents;
         } catch (SQLException e) {
             throw new SQLException(e);
         }
+        return numberOfStudents;
     }
 
     private int countStudentsCoursesID()
             throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
         String countQuery = "SELECT count(*) from school.students_courses;";
         try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(countQuery);) {
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                numberIdInStudentsCoursesTable = Integer.valueOf(rs.getString("count"));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    numberIdInStudentsCoursesTable = Integer.valueOf(rs.getString("count"));
+                }
+            } catch (SQLException e) {
+                throw new SQLException(e);
             }
-            setNumberIdInStudentsCoursesTable(numberIdInStudentsCoursesTable);
             return numberIdInStudentsCoursesTable;
         }
-    }
-
-    public void setNumberOfStudents(int numberOfStudents) {
-        this.numberOfStudents = numberOfStudents;
-    }
-
-    public void setNumberIdInStudentsCoursesTable(int numberIdInStudentsCoursesTable) {
-        this.numberIdInStudentsCoursesTable = numberIdInStudentsCoursesTable;
     }
 }
