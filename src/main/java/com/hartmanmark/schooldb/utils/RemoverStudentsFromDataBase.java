@@ -14,34 +14,34 @@ import com.hartmanmark.schooldb.validator.Validator;
 public class RemoverStudentsFromDataBase {
 
     private String removeStudent = "Please enter an student ID between 1 and ";
-    private String exit = "For return input [exit]";
     private String countOfStudentsQuery = "SELECT count(*) from school.students;";
-    private String result;
-    private String numberOfStudents;
     private String firstName;
     private String lastName;
     private String studentId;
     private Validator validator;
 
-    public void remove() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        numberOfIdStudents();
-        System.out.println(removeStudent + numberOfStudents + "\n" + exit);
-        Scanner scanner = new Scanner(System.in);
-        studentId = scanner.nextLine();
-        if (studentId.equalsIgnoreCase("exit")) {
-            setResult(String.format("%100s", "").replace(' ', '-'));
-            return;
-        }
-        try {
-            findRemovedStudent();
-            removeStudent();
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e);
-        }
+    public RemoverStudentsFromDataBase(Validator validator) {
+        this.validator = validator;
     }
 
-    private void removeStudent() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        validator.veryfyRemoveOption(studentId, numberOfStudents);
+    public String printStudents() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+        return removeStudent + numberOfIdStudents() + "\n";
+    }
+
+    public String chooseStudentId()
+            throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+        scannerSrudentId();
+        findRemovedStudent();
+        return removeStudent();
+    }
+
+    private void scannerSrudentId() {
+        Scanner scanner = new Scanner(System.in);
+        studentId = scanner.nextLine();
+    }
+
+    private String removeStudent() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+        validator.veryfyRemoveOption(studentId, numberOfIdStudents());
         Integer studentIdInt = Integer.parseInt(studentId);
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn.prepareStatement("DELETE FROM school.students WHERE STUDENT_ID = ?")) {
@@ -50,22 +50,24 @@ public class RemoverStudentsFromDataBase {
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        setResult("Student by ID [" + studentId + "]\n" + "first name: " + firstName + "\nlast name: " + lastName
-                + "\nwas succesefully removed.");
+        return "Student by ID [" + studentId + "]\n" + "first name: " + firstName + "\nlast name: " + lastName
+                + "\nwas succesefully removed.";
     }
 
-    private void numberOfIdStudents()
+    private String numberOfIdStudents()
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+        String str = null;
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(countOfStudentsQuery)) {
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
-                    numberOfStudents = resultSet.getString("count");
+                    str = resultSet.getString("count");
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
+        return str;
     }
 
     private void findRemovedStudent()
@@ -83,17 +85,5 @@ public class RemoverStudentsFromDataBase {
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-    }
-
-    public RemoverStudentsFromDataBase(Validator validator) {
-        this.validator = validator;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
     }
 }

@@ -18,7 +18,7 @@ public class Connector {
                     Reader.readDataBaseProperties("user").toString(),
                     Reader.readDataBaseProperties("password").toString());
             if (connection == null) {
-                throw new ConnectionIsNullException("Failed to make connection. Connection is NULL");
+                throw new NullPointerException("Failed to make connection. Connection is NULL");
             }
         } catch (SQLException e) {
             throw new SQLException(e);

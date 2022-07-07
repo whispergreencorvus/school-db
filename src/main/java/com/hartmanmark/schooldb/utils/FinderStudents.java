@@ -16,8 +16,6 @@ public class FinderStudents {
     private Validator validator;
     private int numberOfStudents;
     private String course;
-    private String exit = "To return enter [exit]";
-    private String findedStudents = String.format("%100s", "").replace(' ', '-');
     private String nameOfColumns = "Last names:     First names:";
     private String separator = "-----------     -----------";
     private String enterCourse = "Enter the course (Chemistry, Biology, Physics, Astronomy, History, "
@@ -32,21 +30,25 @@ public class FinderStudents {
             + "ON school.courses.course_id = school.students_courses.course_id \n"
             + "WHERE school.courses.course_name = '";
 
-    public void find() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println(enterCourse + "\n" + exit);
-        course = scanner.nextLine();
-        if (course.equalsIgnoreCase("exit")) {
-            return;
-        }
-        try {
-            findStudents();
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e);
-        }
+    public FinderStudents(Validator validator) {
+        this.validator = validator;
     }
 
-    private void findStudents() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+    public String printStudents() {
+        return enterCourse + "\n";
+    }
+
+    public String chooseCourse() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        scannerCourseId();
+        return findStudents();
+    }
+
+    private void scannerCourseId() {
+        Scanner scanner = new Scanner(System.in);
+        course = scanner.nextLine();
+    }
+
+    private String findStudents() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
         validator.veryfyInputString(course);
         StringBuilder builder = new StringBuilder();
         try (Connection conn = Connector.getConnection();
@@ -63,7 +65,7 @@ public class FinderStudents {
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        setFindedStudents(builder.toString());
+        return builder.toString();
     }
 
     private void countOfStudents() throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
@@ -77,17 +79,5 @@ public class FinderStudents {
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-    }
-
-    public FinderStudents(Validator validator) {
-        this.validator = validator;
-    }
-
-    public String getFindedStudents() {
-        return findedStudents;
-    }
-
-    public void setFindedStudents(String findedStudents) {
-        this.findedStudents = findedStudents;
     }
 }

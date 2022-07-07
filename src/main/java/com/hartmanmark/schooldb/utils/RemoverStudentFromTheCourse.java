@@ -18,35 +18,42 @@ public class RemoverStudentFromTheCourse {
     private String selectStudentsQuery = "SELECT student_id, first_name, last_name FROM school.students ORDER BY student_id ;";
     private String selectCourseQuery = "SELECT school.courses.course_name FROM school.courses WHERE school.courses.course_id = ";
     private String selectStudentQuery = "SELECT school.students.first_name, school.students.last_name FROM school.students WHERE school.students.student_id = ";
-    private String separator = String.format("%100s", "").replace(' ', '-');
-    private String exit = "To return enter [exit]";
     private String studentId;
     private String courseId;
     private String removedCourse;
     private String studentWithRemovedCourse;
-    private String result;
     private Validator validator;
 
-    public void remove() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        System.out.println(
-                "\n" + createStudentsListToPrint(selectStudentsQuery) + "\n" + enterStudentId + "\n" + exit + "\n");
-        Scanner scannerStudentId = new Scanner(System.in);
-        studentId = scannerStudentId.nextLine();
-        if (studentId.equalsIgnoreCase("exit")) {
-            setResult(separator);
-            return;
-        }
-        System.out.println("\n" + createCorsesPerStudentListToPrint(studentId) + "\n" + enterCourseId + "\n");
-        Scanner scannerCourseId = new Scanner(System.in);
-        courseId = scannerCourseId.nextLine();
-        if (courseId.equalsIgnoreCase("exit")) {
-            setResult(separator);
-            return;
-        }
+    public RemoverStudentFromTheCourse(Validator validator) {
+        this.validator = validator;
+    }
+
+    public String printStudents() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        return "\n" + createStudentsListToPrint(selectStudentsQuery) + "\n" + enterStudentId + "\n";
+    }
+
+    public String chooseStudentId()
+            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        scannerStudentId();
+        return "\n" + createCorsesPerStudentListToPrint(studentId) + "\n" + enterCourseId + "\n";
+    }
+
+    public String chooseCourseId() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+        scanneCourseId();
         removeStudentFromTheCourse(studentId, courseId);
         findRemovedCourse();
         findStudentWithRemovedCourse();
-        setResult("Student " + studentWithRemovedCourse + "\nwas succesfully removed from course: " + removedCourse);
+        return "Student " + studentWithRemovedCourse + "\nwas succesfully removed from course: " + removedCourse;
+    }
+
+    private void scanneCourseId() {
+        Scanner scannerCourseId = new Scanner(System.in);
+        courseId = scannerCourseId.nextLine();
+    }
+
+    private void scannerStudentId() {
+        Scanner scannerStudentId = new Scanner(System.in);
+        studentId = scannerStudentId.nextLine();
     }
 
     private void findRemovedCourse()
@@ -130,17 +137,5 @@ public class RemoverStudentFromTheCourse {
             throw new SQLException(e);
         }
         return builder.toString();
-    }
-
-    public RemoverStudentFromTheCourse(Validator validator) {
-        this.validator = validator;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
     }
 }

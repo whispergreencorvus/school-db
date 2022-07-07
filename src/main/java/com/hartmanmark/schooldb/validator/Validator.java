@@ -16,7 +16,7 @@ public class Validator {
             throw new IllegalArgumentException("Input data is null");
         }
         if (input.isEmpty()) {
-            throw new IllegalArgumentException("Input string is empty. Try again.");
+            throw new IllegalArgumentException("Input string is empty.");
         }
         if (input.matches(REGEX_MENU)) {
             throw new IllegalArgumentException("Please enter an integer value between 1 and 7");
@@ -31,7 +31,7 @@ public class Validator {
             throw new IllegalArgumentException("Input data is null");
         }
         if (input.isEmpty()) {
-            throw new IllegalArgumentException("Input string is empty. Try again.");
+            throw new IllegalArgumentException("Input string is empty.");
         }
         if (input.matches(REGEX_INTEGER)) {
             throw new IllegalArgumentException("Please enter an integer value.");
@@ -44,10 +44,10 @@ public class Validator {
             throw new IllegalArgumentException("Input data is null");
         }
         if (input.isEmpty()) {
-            throw new IllegalArgumentException("Input string is empty. Try again.");
+            throw new IllegalArgumentException("Input string is empty.");
         }
         if (input.matches(REGEX_INTEGER)) {
-            throw new IllegalArgumentException("Please enter an integer value. Try again.");
+            throw new IllegalArgumentException("Please enter an integer value.");
         }
         int inputID = Integer.parseInt(input);
         Integer numOfStudentsInt = Integer.parseInt(numberOfStudents);
@@ -61,10 +61,10 @@ public class Validator {
             throw new IllegalArgumentException("Input data is null");
         }
         if (input.isEmpty()) {
-            throw new IllegalArgumentException("Input string is empty. Try again.");
+            throw new IllegalArgumentException("Input string is empty.");
         }
         if (input.matches(REGEX_STRING)) {
-            throw new IllegalArgumentException("Please enter an string value. Try again.");
+            throw new IllegalArgumentException("Please enter an string value.");
         }
     }
 }

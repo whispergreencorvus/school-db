@@ -41,20 +41,23 @@ public class ConsoleMenu {
                 if (input.equals("1")) {
                     System.out.println(finderGroups.findGroups());
                 } else if (input.equals("2")) {
-                    finderStudents.find();
-                    System.out.println(finderStudents.getFindedStudents());
+                    System.out.println(finderStudents.printStudents());
+                    System.out.println(finderStudents.chooseCourse());
                 } else if (input.equals("3")) {
-                    adderStudentsToDataBase.add();
-                    System.out.println(adderStudentsToDataBase.getAddedStudent());
+                    System.out.println(adderStudentsToDataBase.printFirstName());
+                    System.out.println(adderStudentsToDataBase.enterFirstName());
+                    System.out.println(adderStudentsToDataBase.enterLastName());
                 } else if (input.equals("4")) {
-                    removerStudentsFromDataBase.remove();
-                    System.out.println(removerStudentsFromDataBase.getResult());
+                    System.out.println(removerStudentsFromDataBase.printStudents());
+                    System.out.println(removerStudentsFromDataBase.chooseStudentId());
                 } else if (input.equals("5")) {
-                    adderStudentsToTheCourse.add();
-                    System.out.println(adderStudentsToTheCourse.getResult());
+                    System.out.println(adderStudentsToTheCourse.printStudents());
+                    System.out.println(adderStudentsToTheCourse.printCoursesId());
+                    System.out.println(adderStudentsToTheCourse.chooseCourseId());
                 } else if (input.equals("6")) {
-                    removerStudentFromTheCourse.remove();
-                    System.out.println(removerStudentFromTheCourse.getResult());
+                    System.out.println(removerStudentFromTheCourse.printStudents());
+                    System.out.println(removerStudentFromTheCourse.chooseStudentId());
+                    System.out.println(removerStudentFromTheCourse.chooseCourseId());
                 } else if (input.equals("7")) {
                     System.out.println("Exit");
                     break;

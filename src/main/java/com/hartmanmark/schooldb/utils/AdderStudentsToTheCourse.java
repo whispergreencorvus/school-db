@@ -19,34 +19,43 @@ public class AdderStudentsToTheCourse {
     private String studentsQuery = "SELECT student_id, first_name, last_name FROM school.students ORDER BY student_id ;";
     private String outputStudentQuery = "SELECT school.students.first_name, school.students.last_name FROM school.students WHERE school.students.student_id = ";
     private String outputCourseQuery = "SELECT school.courses.course_name FROM school.courses WHERE school.courses.course_id = ";
-    private String separator = String.format("%100s", "").replace(' ', '-');
     private Validator validator;
-    private String result;
     private String course;
     private String studentId;
     private String courseId;
 
-    public void add() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println(createStudentsListToPrint(studentsQuery) + studentIdPrint);
-        studentId = scanner.nextLine();
-        if (studentId.equalsIgnoreCase("exit")) {
-            setResult(separator);
-            return;
-        }
-        System.out.println(createCourseListToPrint(courseQuery) + coursePrint);
-        courseId = scanner.nextLine();
-        if (courseId.equalsIgnoreCase("exit")) {
-            setResult(separator);
-            return;
-        }
+    public AdderStudentsToTheCourse(Validator validator) {
+        this.validator = validator;
+    }
+
+    public String printStudents() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        return createStudentsListToPrint(studentsQuery) + studentIdPrint;
+    }
+
+    public String printCoursesId() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        scannerSrudentId();
+        return createCourseListToPrint(courseQuery) + coursePrint;
+    }
+
+    public String chooseCourseId() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        scannerCourseId();
         findAddedCourse();
-        findAddedStuden();
         try {
             addStudentToTheCourse();
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(e);
         }
+        return findAddedStuden();
+    }
+
+    private void scannerSrudentId() {
+        Scanner scanner = new Scanner(System.in);
+        studentId = scanner.nextLine();
+    }
+
+    private void scannerCourseId() {
+        Scanner scanner = new Scanner(System.in);
+        courseId = scanner.nextLine();
     }
 
     private void addStudentToTheCourse()
@@ -97,18 +106,21 @@ public class AdderStudentsToTheCourse {
         return builder.toString();
     }
 
-    private void findAddedStuden() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+    private String findAddedStuden()
+            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        String outputMassage = null;
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(outputStudentQuery + studentId + ";")) {
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
-                    setResult("Student: " + resultSet.getString(1) + " " + resultSet.getString(2)
-                            + "\nwas succesefully added to the: " + course);
+                    outputMassage = "Student: " + resultSet.getString(1) + " " + resultSet.getString(2)
+                            + "\nwas succesefully added to the: " + course;
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
+        return outputMassage;
     }
 
     private void findAddedCourse() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
@@ -122,17 +134,5 @@ public class AdderStudentsToTheCourse {
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public AdderStudentsToTheCourse(Validator validator) {
-        this.validator = validator;
     }
 }
