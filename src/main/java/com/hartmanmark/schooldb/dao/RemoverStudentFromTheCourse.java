@@ -1,13 +1,11 @@
-package com.hartmanmark.schooldb.utils;
+package com.hartmanmark.schooldb.dao;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
 
-import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.validator.Validator;
 
@@ -32,28 +30,19 @@ public class RemoverStudentFromTheCourse {
         return "\n" + createStudentsListToPrint(selectStudentsQuery) + "\n" + enterStudentId + "\n";
     }
 
-    public String chooseStudentId()
+    public String chooseStudentId(String input)
             throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
-        scannerStudentId();
+        studentId = input;
         return "\n" + createCorsesPerStudentListToPrint(studentId) + "\n" + enterCourseId + "\n";
     }
 
-    public String chooseCourseId() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        scanneCourseId();
+    public String chooseCourseId(String input)
+            throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+        courseId = input;
         removeStudentFromTheCourse(studentId, courseId);
         findRemovedCourse();
         findStudentWithRemovedCourse();
         return "Student " + studentWithRemovedCourse + "\nwas succesfully removed from course: " + removedCourse;
-    }
-
-    private void scanneCourseId() {
-        Scanner scannerCourseId = new Scanner(System.in);
-        courseId = scannerCourseId.nextLine();
-    }
-
-    private void scannerStudentId() {
-        Scanner scannerStudentId = new Scanner(System.in);
-        studentId = scannerStudentId.nextLine();
     }
 
     private void findRemovedCourse()

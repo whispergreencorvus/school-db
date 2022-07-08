@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import com.hartmanmark.schooldb.dao.AdderStudentsToDataBase;
+import com.hartmanmark.schooldb.dao.AdderStudentsToTheCourse;
+import com.hartmanmark.schooldb.dao.FinderGroups;
+import com.hartmanmark.schooldb.dao.FinderStudents;
+import com.hartmanmark.schooldb.dao.RemoverStudentFromTheCourse;
+import com.hartmanmark.schooldb.dao.RemoverStudentsFromDataBase;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
-import com.hartmanmark.schooldb.utils.AdderStudentsToDataBase;
-import com.hartmanmark.schooldb.utils.AdderStudentsToTheCourse;
-import com.hartmanmark.schooldb.utils.FinderGroups;
-import com.hartmanmark.schooldb.utils.FinderStudents;
-import com.hartmanmark.schooldb.utils.RemoverStudentFromTheCourse;
-import com.hartmanmark.schooldb.utils.RemoverStudentsFromDataBase;
 import com.hartmanmark.schooldb.validator.Validator;
 
 public class ConsoleMenu {
@@ -42,22 +42,22 @@ public class ConsoleMenu {
                     System.out.println(finderGroups.findGroups());
                 } else if (input.equals("2")) {
                     System.out.println(finderStudents.printStudents());
-                    System.out.println(finderStudents.chooseCourse());
+                    System.out.println(finderStudents.chooseCourse(scanSubmenu()));
                 } else if (input.equals("3")) {
                     System.out.println(adderStudentsToDataBase.printFirstName());
-                    System.out.println(adderStudentsToDataBase.enterFirstName());
-                    System.out.println(adderStudentsToDataBase.enterLastName());
+                    System.out.println(adderStudentsToDataBase.enterFirstName(scanSubmenu()));
+                    System.out.println(adderStudentsToDataBase.enterLastName(scanSubmenu()));
                 } else if (input.equals("4")) {
-                    System.out.println(removerStudentsFromDataBase.printStudents());
-                    System.out.println(removerStudentsFromDataBase.chooseStudentId());
+                    System.out.println(removerStudentsFromDataBase.printNamberOfStudents());
+                    System.out.println(removerStudentsFromDataBase.chooseStudentId(scanSubmenu()));
                 } else if (input.equals("5")) {
                     System.out.println(adderStudentsToTheCourse.printStudents());
-                    System.out.println(adderStudentsToTheCourse.printCoursesId());
-                    System.out.println(adderStudentsToTheCourse.chooseCourseId());
+                    System.out.println(adderStudentsToTheCourse.printCoursesId(scanSubmenu()));
+                    System.out.println(adderStudentsToTheCourse.chooseCourseId(scanSubmenu()));
                 } else if (input.equals("6")) {
                     System.out.println(removerStudentFromTheCourse.printStudents());
-                    System.out.println(removerStudentFromTheCourse.chooseStudentId());
-                    System.out.println(removerStudentFromTheCourse.chooseCourseId());
+                    System.out.println(removerStudentFromTheCourse.chooseStudentId(scanSubmenu()));
+                    System.out.println(removerStudentFromTheCourse.chooseCourseId(scanSubmenu()));
                 } else if (input.equals("7")) {
                     System.out.println("Exit");
                     break;
@@ -68,6 +68,12 @@ public class ConsoleMenu {
         }
     }
 
+    private String scanSubmenu() {
+        Scanner scanner = new Scanner(System.in);
+        String inputInOption = scanner.nextLine();
+        return inputInOption;
+    }
+    
     private void printMenu(String[] options) {
         for (String option : options) {
             System.out.println(option);

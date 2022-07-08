@@ -16,12 +16,11 @@ import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 
 public class DataGenerator {
 
-    private String groupName;
-    private final int MAX_NUMBER_OF_STUDENTS_IN_ONE_GROUP = 30;
-    private final int MIN_NUMBER_OF_STUDENTS_IN_ONE_GROUP = 15;
-    private List<String> randomFirstName = new ArrayList<String>();
-    private List<String> randomLastName = new ArrayList<String>();
-    private int numberOfStudents;
+    private static final int MAX_NUMBER_OF_STUDENTS_IN_ONE_GROUP = 30;
+    private static final int MIN_NUMBER_OF_STUDENTS_IN_ONE_GROUP = 15;
+    private List<String> randomFirstName = new ArrayList<>();
+    private List<String> randomLastName = new ArrayList<>();
+//    private int numberOfStudents;
     private DataInserter inserter = new DataInserter();
     private StudentDao studentDao = new StudentDao();
 
@@ -37,17 +36,16 @@ public class DataGenerator {
 
     private void countOfStudents() throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
         String countStudentsQuery = "SELECT count(*) from school.students;";
-        Integer numberOfStudents = null;
         try (PreparedStatement statement = Connector.getConnection().prepareStatement(countStudentsQuery)) {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    numberOfStudents = Integer.valueOf(resultSet.getString("count"));
+                    Integer.valueOf(resultSet.getString("count"));
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        setNumberOfStudents(numberOfStudents);
+//        setNumberOfStudents(numberOfStudents);
     }
 
     private String getRandomAlphaString() {
@@ -74,7 +72,7 @@ public class DataGenerator {
         for (int i = 1; i < 11; i++) {
             String firstParthOfGroupName = getRandomAlphaString();
             String lastParthOfGroupName = getRandomNumericString();
-            groupName = firstParthOfGroupName + '-' + lastParthOfGroupName;
+            String groupName = firstParthOfGroupName + '-' + lastParthOfGroupName;
             inserter.insertGroups(groupName);
             putStudentsInOneGroup(i);
         }
@@ -113,11 +111,11 @@ public class DataGenerator {
         }
     }
 
-    public int getNumberOfStudents() {
-        return numberOfStudents;
-    }
+//    public int getNumberOfStudents() {
+//        return numberOfStudents;
+//    }
 
-    public void setNumberOfStudents(int numberOfStudents) {
-        this.numberOfStudents = numberOfStudents;
-    }
+//    public void setNumberOfStudents(int numberOfStudents) {
+//        this.numberOfStudents = numberOfStudents;
+//    }
 }

@@ -21,8 +21,7 @@ public class DataBaseCreator {
     }
 
     private BufferedReader readSQLFile() throws ClassNotFoundException, IOException, SQLException {
-        BufferedReader readerSchema = new BufferedReader(
+        return new BufferedReader(
                 new FileReader(Reader.readPathProperties("pathToShemaSQLFile")));
-        return readerSchema;
     }
 }

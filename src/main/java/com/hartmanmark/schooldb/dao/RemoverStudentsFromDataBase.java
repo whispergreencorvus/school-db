@@ -1,13 +1,11 @@
-package com.hartmanmark.schooldb.utils;
+package com.hartmanmark.schooldb.dao;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
 
-import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.validator.Validator;
 
@@ -24,24 +22,19 @@ public class RemoverStudentsFromDataBase {
         this.validator = validator;
     }
 
-    public String printStudents() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        return removeStudent + numberOfIdStudents() + "\n";
+    public String printNamberOfStudents() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+        return removeStudent + countNumberOfIdStudents() + "\n";
     }
 
-    public String chooseStudentId()
+    public String chooseStudentId(String input)
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        scannerSrudentId();
+        studentId = input;
         findRemovedStudent();
         return removeStudent();
     }
 
-    private void scannerSrudentId() {
-        Scanner scanner = new Scanner(System.in);
-        studentId = scanner.nextLine();
-    }
-
     private String removeStudent() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        validator.veryfyRemoveOption(studentId, numberOfIdStudents());
+        validator.veryfyRemoveOption(studentId, countNumberOfIdStudents());
         Integer studentIdInt = Integer.parseInt(studentId);
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn.prepareStatement("DELETE FROM school.students WHERE STUDENT_ID = ?")) {
@@ -54,20 +47,20 @@ public class RemoverStudentsFromDataBase {
                 + "\nwas succesefully removed.";
     }
 
-    private String numberOfIdStudents()
+    private String countNumberOfIdStudents()
             throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        String str = null;
+        String numberOfIdStudents = null;
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(countOfStudentsQuery)) {
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
-                    str = resultSet.getString("count");
+                    numberOfIdStudents = resultSet.getString("count");
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        return str;
+        return numberOfIdStudents;
     }
 
     private void findRemovedStudent()

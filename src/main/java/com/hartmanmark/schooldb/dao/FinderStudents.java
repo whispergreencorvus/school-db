@@ -1,13 +1,11 @@
-package com.hartmanmark.schooldb.utils;
+package com.hartmanmark.schooldb.dao;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
 
-import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.validator.Validator;
 
@@ -38,14 +36,10 @@ public class FinderStudents {
         return enterCourse + "\n";
     }
 
-    public String chooseCourse() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
-        scannerCourseId();
+    public String chooseCourse(String input)
+            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        course = input;
         return findStudents();
-    }
-
-    private void scannerCourseId() {
-        Scanner scanner = new Scanner(System.in);
-        course = scanner.nextLine();
     }
 
     private String findStudents() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {

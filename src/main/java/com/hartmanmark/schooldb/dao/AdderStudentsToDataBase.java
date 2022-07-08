@@ -1,12 +1,10 @@
-package com.hartmanmark.schooldb.utils;
+package com.hartmanmark.schooldb.dao;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Scanner;
 
-import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.validator.Validator;
 
@@ -16,8 +14,7 @@ public class AdderStudentsToDataBase {
     private String lastNamePrint = "Please enter student last name: ";
     private String creadedStudent = "A new student has been successfully added: ";
     private Validator validator;
-    private String firstName = null;
-    private String lastName = null;
+    private String firstName;
 
     public AdderStudentsToDataBase(Validator validator) {
         this.validator = validator;
@@ -27,14 +24,15 @@ public class AdderStudentsToDataBase {
         return firstNamePrint + "\n";
     }
 
-    public String enterFirstName() {
-        scannerFirstName();
+    public String enterFirstName(String input) {
+        firstName = input;
         validator.veryfyInputString(firstName);
         return lastNamePrint;
     }
 
-    public String enterLastName() throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
-        scannerLastName();
+    public String enterLastName(String input)
+            throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+        String lastName = input;
         validator.veryfyInputString(lastName);
         try {
             addStudentToDataBase(firstName, lastName);
@@ -42,16 +40,6 @@ public class AdderStudentsToDataBase {
             throw new IllegalArgumentException(e);
         }
         return "\n" + creadedStudent + "[" + firstName + " " + lastName + "]";
-    }
-
-    private void scannerLastName() {
-        Scanner scanner = new Scanner(System.in);
-        lastName = scanner.nextLine();
-    }
-
-    private void scannerFirstName() {
-        Scanner scanner = new Scanner(System.in);
-        firstName = scanner.nextLine();
     }
 
     private void addStudentToDataBase(String firstName, String lastName)

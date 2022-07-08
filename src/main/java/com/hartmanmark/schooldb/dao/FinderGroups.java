@@ -1,4 +1,4 @@
-package com.hartmanmark.schooldb.utils;
+package com.hartmanmark.schooldb.dao;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 
 public class FinderGroups {

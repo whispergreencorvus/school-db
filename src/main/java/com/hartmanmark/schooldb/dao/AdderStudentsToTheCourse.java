@@ -1,13 +1,11 @@
-package com.hartmanmark.schooldb.utils;
+package com.hartmanmark.schooldb.dao;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
 
-import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.validator.Validator;
 
@@ -32,13 +30,15 @@ public class AdderStudentsToTheCourse {
         return createStudentsListToPrint(studentsQuery) + studentIdPrint;
     }
 
-    public String printCoursesId() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
-        scannerSrudentId();
+    public String printCoursesId(String input)
+            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        studentId = input;
         return createCourseListToPrint(courseQuery) + coursePrint;
     }
 
-    public String chooseCourseId() throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
-        scannerCourseId();
+    public String chooseCourseId(String input)
+            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+        courseId = input;
         findAddedCourse();
         try {
             addStudentToTheCourse();
@@ -46,16 +46,6 @@ public class AdderStudentsToTheCourse {
             throw new IllegalArgumentException(e);
         }
         return findAddedStuden();
-    }
-
-    private void scannerSrudentId() {
-        Scanner scanner = new Scanner(System.in);
-        studentId = scanner.nextLine();
-    }
-
-    private void scannerCourseId() {
-        Scanner scanner = new Scanner(System.in);
-        courseId = scanner.nextLine();
     }
 
     private void addStudentToTheCourse()
