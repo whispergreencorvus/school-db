@@ -10,7 +10,6 @@ public class Student {
         this.studentId = studentId;
         this.firstName = firstName;
         this.lastName = lastName;
-
     }
 
     public String getStudentId() {

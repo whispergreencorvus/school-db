@@ -17,12 +17,12 @@ public class StudentDaoImpl implements StudentDao {
 
     private Validator validator;
     private String courseQuery = "SELECT course_id, course_name FROM school.courses ORDER BY course_id ;";
-    private String findGroups = "WITH tab AS (SELECT school.groups.group_name, COUNT(*) AS count_ "
+    private String findGroupsQuery = "WITH tab AS (SELECT school.groups.group_name, COUNT(*) AS count_ "
             + "FROM  school.students "
             + "INNER JOIN school.groups ON school.students.group_id = school.groups.group_id "
             + "GROUP BY school.groups.group_name " + "ORDER BY count_ ) SELECT * FROM tab "
             + "WHERE count_ IN ( SELECT count_ FROM tab GROUP BY count_ HAVING count(*) > 1);";
-    private String studentsPerGroup = "SELECT school.students.student_id, school.students.first_name, school.students.last_name  "
+    private String studentsPerGroupQuery = "SELECT school.students.student_id, school.students.first_name, school.students.last_name  "
             + "FROM school.students JOIN school.students_courses "
             + "ON school.students.student_id = school.students_courses.student_id JOIN school.courses\n"
             + "ON school.courses.course_id = school.students_courses.course_id "
@@ -54,21 +54,6 @@ public class StudentDaoImpl implements StudentDao {
 
     public StudentDaoImpl(Validator validator) {
         this.validator = validator;
-    }
-
-    private String countOfStudents() throws SQLException, ClassNotFoundException, IOException, NullPointerException {
-        String query = "SELECT count(*) from school.students;";
-        String quontity = null;
-        try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    quontity = rs.getString("count");
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLException(e);
-        }
-        return quontity;
     }
 
     public String countNumber() throws ClassNotFoundException, SQLException, IOException, NullPointerException {
@@ -155,7 +140,7 @@ public class StudentDaoImpl implements StudentDao {
 
     public List<Group> findGroups() throws ClassNotFoundException, IOException, NullPointerException, SQLException {
         List<Group> result = new ArrayList<>();
-        try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(findGroups)) {
+        try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(findGroupsQuery)) {
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
                     result.add(new Group(resultSet.getString(1), resultSet.getString(2)));
@@ -172,7 +157,7 @@ public class StudentDaoImpl implements StudentDao {
         validator.veryfyInputString(course);
         List<Student> result = new ArrayList<>();
         try (Connection conn = Connector.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(studentsPerGroup + course + orderByIdQuery)) {
+                PreparedStatement stmt = conn.prepareStatement(studentsPerGroupQuery + course + orderByIdQuery)) {
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
                     result.add(new Student(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3)));
@@ -213,7 +198,7 @@ public class StudentDaoImpl implements StudentDao {
 
     public List<Student> findStudent(String studentId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException {
-        validator.veryfyRemoveOption(studentId, countOfStudents());
+        validator.veryfyRemoveOption(studentId, countNumber());
         List<Student> result = new ArrayList<>();
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(findStudentQuery + studentId + ";")) {

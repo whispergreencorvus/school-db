@@ -25,5 +25,4 @@ public class Group {
     public void setNamberOfStudents(String namberOfStudents) {
         this.namberOfStudents = namberOfStudents;
     }
-
 }
