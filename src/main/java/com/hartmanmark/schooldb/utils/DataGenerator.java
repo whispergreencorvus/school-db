@@ -2,6 +2,7 @@ package com.hartmanmark.schooldb.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,8 +12,6 @@ import java.util.Random;
 import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.Connector;
-import com.hartmanmark.schooldb.dao.StudentDao;
-import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 
 public class DataGenerator {
 
@@ -20,32 +19,75 @@ public class DataGenerator {
     private static final int MIN_NUMBER_OF_STUDENTS_IN_ONE_GROUP = 15;
     private List<String> randomFirstName = new ArrayList<>();
     private List<String> randomLastName = new ArrayList<>();
-//    private int numberOfStudents;
     private DataInserter inserter = new DataInserter();
-    private StudentDao studentDao = new StudentDao();
+    private Random random;
+
+    private static final int MAX_NUMBER_OF_COURSES = 11;
+    private static final int MIN_NUMBER_OF_COURSES = 1;
+    private static final int MAX_NUMBER_OF_COURSES_PER_STUDENT = 4;
+    private static final int MIX_NUMBER_OF_COURSES_PER_STUDENT = 1;
 
     public void generate(File pathToFirstName, File pathToLastName)
-            throws IOException, SQLException, ClassNotFoundException, ConnectionIsNullException {
+            throws IOException, SQLException, ClassNotFoundException, NullPointerException {
         getListOfRandomFirstNames(pathToFirstName);
         getListOfRandomLastNames(pathToLastName);
         inserter.insertCourses();
         createGroups();
         countOfStudents();
-        studentDao.createRelation();
+        createStudents();
+        createRelationStudentsCourses();
     }
 
-    private void countOfStudents() throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
-        String countStudentsQuery = "SELECT count(*) from school.students;";
-        try (PreparedStatement statement = Connector.getConnection().prepareStatement(countStudentsQuery)) {
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    Integer.valueOf(resultSet.getString("count"));
+    private void createRelationStudentsCourses()
+            throws ClassNotFoundException, SQLException, IOException, NullPointerException {
+        random = new Random();
+        StringBuilder string = new StringBuilder();
+        int r = Integer.parseInt(countOfStudents());
+        for (int i = 1; i < r + 1; i++) {
+            int rangeOfCourse = random.nextInt(MAX_NUMBER_OF_COURSES - MIN_NUMBER_OF_COURSES) + MIN_NUMBER_OF_COURSES;
+            String s = "UPDATE school.students_courses SET COURSE_ID = " + rangeOfCourse + " WHERE ID = " + i + ";";
+            string.append(s);
+        }
+        try (PreparedStatement statement = Connector.getConnection().prepareStatement(string.toString())) {
+            statement.execute();
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        }
+    }
+
+    private void createStudents() throws ClassNotFoundException, SQLException, IOException, NullPointerException {
+        StringBuilder stringBuilder = new StringBuilder();
+        random = new Random();
+        int r = Integer.parseInt(countOfStudents());
+        for (int j = 1; j < r + 1; j++) {
+            int rangeCoursesInOneStudent = random
+                    .nextInt(MAX_NUMBER_OF_COURSES_PER_STUDENT - MIX_NUMBER_OF_COURSES_PER_STUDENT)
+                    + MIX_NUMBER_OF_COURSES_PER_STUDENT;
+            for (int i = 0; i < rangeCoursesInOneStudent; i++) {
+                String str = "INSERT INTO school.students_courses(STUDENT_ID, COURSE_ID) VALUES (" + j + ", DEFAULT);";
+                stringBuilder.append(str);
+            }
+        }
+        try (PreparedStatement statement = Connector.getConnection().prepareStatement(stringBuilder.toString())) {
+            statement.execute();
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        }
+    }
+
+    private String countOfStudents() throws SQLException, ClassNotFoundException, IOException, NullPointerException {
+        String query = "SELECT count(*) from school.students;";
+        String quontity = null;
+        try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    quontity = rs.getString("count");
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-//        setNumberOfStudents(numberOfStudents);
+        return quontity;
     }
 
     private String getRandomAlphaString() {
@@ -68,7 +110,7 @@ public class DataGenerator {
         return randomNumericString.toString();
     }
 
-    private void createGroups() throws SQLException, ClassNotFoundException, IOException, ConnectionIsNullException {
+    private void createGroups() throws SQLException, ClassNotFoundException, IOException, NullPointerException {
         for (int i = 1; i < 11; i++) {
             String firstParthOfGroupName = getRandomAlphaString();
             String lastParthOfGroupName = getRandomNumericString();
@@ -88,7 +130,7 @@ public class DataGenerator {
     }
 
     private void putStudentsInOneGroup(int idGroup)
-            throws IOException, SQLException, ClassNotFoundException, ConnectionIsNullException {
+            throws IOException, SQLException, ClassNotFoundException, NullPointerException {
         Random random = new Random();
         int range = random.nextInt(MAX_NUMBER_OF_STUDENTS_IN_ONE_GROUP - MIN_NUMBER_OF_STUDENTS_IN_ONE_GROUP)
                 + MIN_NUMBER_OF_STUDENTS_IN_ONE_GROUP;
@@ -110,12 +152,4 @@ public class DataGenerator {
             }
         }
     }
-
-//    public int getNumberOfStudents() {
-//        return numberOfStudents;
-//    }
-
-//    public void setNumberOfStudents(int numberOfStudents) {
-//        this.numberOfStudents = numberOfStudents;
-//    }
 }

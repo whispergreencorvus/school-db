@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.utils.DataGenerator;
 
 public class Reader {
@@ -20,13 +19,13 @@ public class Reader {
     private static String pathToProperties = "/home/user/java/GitLab/Task 7/task-7/path.properties";
     private static String pathToDataBaseProperties = "/home/user/java/GitLab/Task 7/task-7/database.properties";
 
-    public void read() throws IOException, ClassNotFoundException, SQLException, ConnectionIsNullException {
+    public void read() throws IOException, ClassNotFoundException, SQLException, NullPointerException {
         readFirstName();
         readLastName();
         generator.generate(getPathToFirstName(), getPathToLastName());
     }
 
-    public static File readPathProperties(String keyProperty) throws IOException, ClassNotFoundException, SQLException {
+    public static File readPathProperties(String keyProperty) throws IOException {
         fileReader = new FileReader(pathToProperties);
         properties = new Properties();
         properties.load(fileReader);
@@ -35,7 +34,7 @@ public class Reader {
     }
 
     public static File readDataBaseProperties(String keyProperty)
-            throws IOException, ClassNotFoundException, SQLException {
+            throws IOException {
         fileReader = new FileReader(pathToDataBaseProperties);
         properties = new Properties();
         properties.load(fileReader);
@@ -43,11 +42,11 @@ public class Reader {
         return file;
     }
 
-    private void readFirstName() throws ClassNotFoundException, IOException, SQLException {
+    private void readFirstName() throws IOException {
         setPathToFirstName(readPathProperties("firstName"));
     }
 
-    private void readLastName() throws ClassNotFoundException, IOException, SQLException {
+    private void readLastName() throws IOException {
         setPathToLastName(readPathProperties("lastName"));
     }
 

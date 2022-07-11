@@ -5,13 +5,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
 import com.hartmanmark.schooldb.service.Reader;
 
 public class Connector {
 
-    public static Connection getConnection()
-            throws ClassNotFoundException, IOException, ConnectionIsNullException, SQLException {
+    public static Connection getConnection() throws ClassNotFoundException, IOException, SQLException {
         Connection connection = null;
         try {
             connection = DriverManager.getConnection(Reader.readDataBaseProperties("url").toString(),

@@ -1,70 +1,70 @@
 package com.hartmanmark.schooldb.validator;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-import com.hartmanmark.schooldb.exception.ConnectionIsNullException;
-
 public class Validator {
 
-    private final String REGEX_MENU = "[^w^[1-7]]+";
-    private final String REGEX_INTEGER = "[^w^[0-9]]+";
-    private final String REGEX_STRING = "[^wd^[a-zA-Z]]+";
+    private static final String REGEX_MENU = "[^w^[1-7]]+";
+    private static final String REGEX_INTEGER = "[^w^[0-9]]+";
+    private static final String REGEX_STRING = "[^wd^[a-zA-Z]]+";
+    private String dataIsNull = "Input data is null";
+    private String emptyString = "Input string is empty.";
+    private String enterIntiger = "Please enter an integer value.";
+    private String oneCharacter = "Input must be contain only one character";
+    private String valueRange = "Please enter an integer value between 1 and 7";
+    private String valueBetween = "Please enter an integer value between 1 and ";
 
     public void verifyMenuChoose(String input) {
         if (input == null) {
-            throw new IllegalArgumentException("Input data is null");
+            throw new IllegalArgumentException(dataIsNull);
         }
         if (input.isEmpty()) {
-            throw new IllegalArgumentException("Input string is empty.");
+            throw new IllegalArgumentException(emptyString);
         }
         if (input.matches(REGEX_MENU)) {
-            throw new IllegalArgumentException("Please enter an integer value between 1 and 7");
+            throw new IllegalArgumentException(valueRange);
         }
         if (input.toCharArray().length > 1) {
-            throw new IllegalArgumentException("Input must be contain only one character");
+            throw new IllegalArgumentException(oneCharacter);
         }
     }
 
     public void verifyInteger(String input) {
         if (input == null) {
-            throw new IllegalArgumentException("Input data is null");
+            throw new IllegalArgumentException(dataIsNull);
         }
         if (input.isEmpty()) {
-            throw new IllegalArgumentException("Input string is empty.");
+            throw new IllegalArgumentException(emptyString);
         }
         if (input.matches(REGEX_INTEGER)) {
-            throw new IllegalArgumentException("Please enter an integer value.");
+            throw new IllegalArgumentException(enterIntiger);
         }
     }
 
-    public void veryfyRemoveOption(String input, String numberOfStudents)
-            throws ClassNotFoundException, SQLException, IOException, ConnectionIsNullException {
+    public void veryfyRemoveOption(String input, String numberOfStudents) {
         if (input == null) {
-            throw new IllegalArgumentException("Input data is null");
+            throw new IllegalArgumentException(dataIsNull);
         }
         if (input.isEmpty()) {
-            throw new IllegalArgumentException("Input string is empty.");
+            throw new IllegalArgumentException(emptyString);
         }
         if (input.matches(REGEX_INTEGER)) {
-            throw new IllegalArgumentException("Please enter an integer value.");
+            throw new IllegalArgumentException(enterIntiger);
         }
         int inputID = Integer.parseInt(input);
         Integer numOfStudentsInt = Integer.parseInt(numberOfStudents);
         if (inputID > numOfStudentsInt) {
-            throw new IllegalArgumentException("Please enter an integer value between 1 and " + numberOfStudents);
+            throw new IllegalArgumentException(valueBetween + numberOfStudents);
         }
     }
 
     public void veryfyInputString(String input) {
         if (input == null) {
-            throw new IllegalArgumentException("Input data is null");
+            throw new IllegalArgumentException(dataIsNull);
         }
         if (input.isEmpty()) {
-            throw new IllegalArgumentException("Input string is empty.");
+            throw new IllegalArgumentException(emptyString);
         }
         if (input.matches(REGEX_STRING)) {
-            throw new IllegalArgumentException("Please enter an string value.");
+            throw new IllegalArgumentException(enterIntiger);
         }
     }
 }
