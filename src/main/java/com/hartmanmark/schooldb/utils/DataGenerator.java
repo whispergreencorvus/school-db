@@ -17,18 +17,17 @@ public class DataGenerator {
 
     private static final int MAX_NUMBER_OF_STUDENTS_IN_ONE_GROUP = 30;
     private static final int MIN_NUMBER_OF_STUDENTS_IN_ONE_GROUP = 15;
+    private static final int MAX_NUMBER_OF_COURSES_PER_STUDENT = 4;
+    private static final int MIX_NUMBER_OF_COURSES_PER_STUDENT = 1;
+    private static final int MAX_NUMBER_OF_COURSES = 11;
+    private static final int MIN_NUMBER_OF_COURSES = 1;
     private List<String> randomFirstName = new ArrayList<>();
     private List<String> randomLastName = new ArrayList<>();
     private DataInserter inserter = new DataInserter();
     private Random random;
 
-    private static final int MAX_NUMBER_OF_COURSES = 11;
-    private static final int MIN_NUMBER_OF_COURSES = 1;
-    private static final int MAX_NUMBER_OF_COURSES_PER_STUDENT = 4;
-    private static final int MIX_NUMBER_OF_COURSES_PER_STUDENT = 1;
-
     public void generate(File pathToFirstName, File pathToLastName)
-            throws IOException, SQLException, ClassNotFoundException, NullPointerException {
+            throws IOException, SQLException, NullPointerException {
         getListOfRandomFirstNames(pathToFirstName);
         getListOfRandomLastNames(pathToLastName);
         inserter.insertCourses();
@@ -38,12 +37,11 @@ public class DataGenerator {
         createRelationStudentsCourses();
     }
 
-    private void createRelationStudentsCourses()
-            throws ClassNotFoundException, SQLException, IOException, NullPointerException {
+    private void createRelationStudentsCourses() throws SQLException, IOException, NullPointerException {
         random = new Random();
         StringBuilder string = new StringBuilder();
-        int r = Integer.parseInt(countOfStudents());
-        for (int i = 1; i < r + 1; i++) {
+        int numberOfStudents = Integer.parseInt(countOfStudents());
+        for (int i = 1; i < numberOfStudents + 1; i++) {
             int rangeOfCourse = random.nextInt(MAX_NUMBER_OF_COURSES - MIN_NUMBER_OF_COURSES) + MIN_NUMBER_OF_COURSES;
             String s = "UPDATE school.students_courses SET COURSE_ID = " + rangeOfCourse + " WHERE ID = " + i + ";";
             string.append(s);
@@ -55,11 +53,11 @@ public class DataGenerator {
         }
     }
 
-    private void createStudents() throws ClassNotFoundException, SQLException, IOException, NullPointerException {
+    private void createStudents() throws SQLException, IOException, NullPointerException {
         StringBuilder stringBuilder = new StringBuilder();
-        random = new Random();
-        int r = Integer.parseInt(countOfStudents());
-        for (int j = 1; j < r + 1; j++) {
+
+        int namberOfStudents = Integer.parseInt(countOfStudents());
+        for (int j = 1; j < namberOfStudents + 1; j++) {
             int rangeCoursesInOneStudent = random
                     .nextInt(MAX_NUMBER_OF_COURSES_PER_STUDENT - MIX_NUMBER_OF_COURSES_PER_STUDENT)
                     + MIX_NUMBER_OF_COURSES_PER_STUDENT;
@@ -75,7 +73,7 @@ public class DataGenerator {
         }
     }
 
-    private String countOfStudents() throws SQLException, ClassNotFoundException, IOException, NullPointerException {
+    private String countOfStudents() throws SQLException, IOException, NullPointerException {
         String query = "SELECT count(*) from school.students;";
         String quontity = null;
         try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -92,25 +90,27 @@ public class DataGenerator {
 
     private String getRandomAlphaString() {
         String alphaString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        random = new Random();
         StringBuilder randomAlphaString = new StringBuilder();
         for (int i = 0; i < 2; i++) {
-            int index = (int) (alphaString.length() * Math.random());
+            int index = random.nextInt(26);
             randomAlphaString.append(alphaString.charAt(index));
         }
         return randomAlphaString.toString();
     }
 
     private String getRandomNumericString() {
-        String AlphaString = "1234567890";
+        String numbersString = "1234567890";
+        random = new Random();
         StringBuilder randomNumericString = new StringBuilder();
         for (int i = 0; i < 2; i++) {
-            int index = (int) (AlphaString.length() * Math.random());
-            randomNumericString.append(AlphaString.charAt(index));
+            int index = random.nextInt(10);
+            randomNumericString.append(numbersString.charAt(index));
         }
         return randomNumericString.toString();
     }
 
-    private void createGroups() throws SQLException, ClassNotFoundException, IOException, NullPointerException {
+    private void createGroups() throws SQLException, IOException, NullPointerException {
         for (int i = 1; i < 11; i++) {
             String firstParthOfGroupName = getRandomAlphaString();
             String lastParthOfGroupName = getRandomNumericString();
@@ -120,8 +120,7 @@ public class DataGenerator {
         }
     }
 
-    private void getListOfRandomFirstNames(File pathToFirstNames)
-            throws IOException, ClassNotFoundException, SQLException {
+    private void getListOfRandomFirstNames(File pathToFirstNames) throws IOException {
         try (Scanner scannerFirstName = new Scanner(pathToFirstNames)) {
             while (scannerFirstName.hasNextLine()) {
                 randomFirstName.add(scannerFirstName.nextLine());
@@ -129,9 +128,8 @@ public class DataGenerator {
         }
     }
 
-    private void putStudentsInOneGroup(int idGroup)
-            throws IOException, SQLException, ClassNotFoundException, NullPointerException {
-        Random random = new Random();
+    private void putStudentsInOneGroup(int idGroup) throws IOException, SQLException, NullPointerException {
+        random = new Random();
         int range = random.nextInt(MAX_NUMBER_OF_STUDENTS_IN_ONE_GROUP - MIN_NUMBER_OF_STUDENTS_IN_ONE_GROUP)
                 + MIN_NUMBER_OF_STUDENTS_IN_ONE_GROUP;
         StringBuilder insertStudentsInOneGroup = new StringBuilder();

@@ -2,9 +2,9 @@ package com.hartmanmark.schooldb.model;
 
 public class Student {
 
+    private String studentId;
     private String firstName;
     private String lastName;
-    private String studentId;
 
     public Student(String studentId, String firstName, String lastName) {
         this.studentId = studentId;

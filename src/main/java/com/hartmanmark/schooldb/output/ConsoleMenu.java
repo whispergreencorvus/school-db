@@ -6,6 +6,7 @@ import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.StudentDao;
 import com.hartmanmark.schooldb.dao.StudentDaoImpl;
+import com.hartmanmark.schooldb.input.Input;
 import com.hartmanmark.schooldb.service.StudentService;
 import com.hartmanmark.schooldb.validator.Validator;
 
@@ -18,63 +19,30 @@ public class ConsoleMenu {
     private String welcom = "Welcom to simple sql-jdbc-school app.";
     private String separator = String.format("%100s", "").replace(' ', '-') + "\n";
     private Validator validator = new Validator();
-    private String enterFirstName = "Please enter student first name: ";
-    private String enterLastName = "Please enter student last name: ";
-    private StudentService studentService = new StudentService();
-    private String enterCourse = "Enter the course (Chemistry, Biology, Physics, Astronomy, History, "
-            + "Anthropology, Geography, Mathematics, Philosophy, Linguistics)";
-    private String enterStudentIdBetween = "Please enter an student ID between 1 and ";
-    private String enterStudentId = "\nPlease enter student ID: ";
-    private String enterCOurseId = "\nPlease enter course ID: ";
-    private StudentDao studentDao = new StudentDaoImpl(validator);
-    private String studentsOnCourse = "Students on the course: ";
+    private Input input = new Input();
 
     public void runConsole() throws ClassNotFoundException, SQLException, IOException, NullPointerException {
-
         System.out.print(separator + "\n" + welcom);
-        String input;
+        String inputData;
         while (true) {
             try {
                 printMenu(options);
                 Scanner scanner = new Scanner(System.in);
-                input = scanner.nextLine();
-                validator.verifyMenuChoose(input);
-                if (input.equals("1")) {
-                    System.out.println(studentService.printFindedGroups(studentDao.findGroups()));
-                } else if (input.equals("2")) {
-                    System.out.println(enterCourse);
-                    String course = scanSubmenu();
-                    System.out.println(studentService.printAll(studentDao.findInCourse(course)));
-                    System.out.println(studentsOnCourse + studentDao.countPerCourse(course));
-                } else if (input.equals("3")) {
-                    System.out.println(enterFirstName + "\n");
-                    String firstName = scanSubmenu();
-                    System.out.println(enterLastName + "\n");
-                    String lastName = scanSubmenu();
-                    System.out.println(
-                            studentService.printAddedToDB(studentDao.addToDB(firstName, lastName)));
-                } else if (input.equals("4")) {
-                    System.out.println(enterStudentIdBetween + studentDao.countNumber());
-                    String studentId = scanSubmenu();
-                    System.out.println(studentService.printRemovedStudent(studentDao.findStudent(studentId)));
-                    studentDao.removeStudent(studentId);
-                } else if (input.equals("5")) {
-                    System.out.println(studentService.printAll(studentDao.createListOfStudents()) + enterStudentId);
-                    String studentId = scanSubmenu();
-                    System.out.println(studentService.printCourses(studentDao.createListOfCourses()) + enterCOurseId);
-                    String courseId = scanSubmenu();
-                    studentDao.addToTheCourse(studentId, courseId);
-                    System.out.println(studentService.printAdded(studentDao.findStudent(studentId),
-                            studentDao.findCourse(courseId)));
-                } else if (input.equals("6")) {
-                    System.out.println(studentService.printAll(studentDao.createListOfStudents()) + enterStudentId);
-                    String studentId = scanSubmenu();
-                    System.out.println(studentService.printCourses(studentDao.createCorsesListPerStudent(studentId)));
-                    String courseId = scanSubmenu();
-                    studentDao.removeFromTheCourse(studentId, courseId);
-                    System.out.println(studentService.printRemoved(studentDao.findStudent(studentId),
-                            studentDao.findCourse(courseId)));
-                } else if (input.equals("7")) {
+                inputData = scanner.nextLine();
+                validator.verifyMenuChoose(inputData);
+                if (inputData.equals("1")) {
+                    input.findGroups();
+                } else if (inputData.equals("2")) {
+                    input.findStudentsInCourse();
+                } else if (inputData.equals("3")) {
+                    input.addStudent();
+                } else if (inputData.equals("4")) {
+                    input.deleteStudent();
+                } else if (inputData.equals("5")) {
+                    input.addStudentToTheCourse();
+                } else if (inputData.equals("6")) {
+                    input.removeStudentFromTheCourse();
+                } else if (inputData.equals("7")) {
                     System.out.println("Exit");
                     break;
                 }
@@ -82,11 +50,6 @@ public class ConsoleMenu {
                 throw new IllegalArgumentException(e);
             }
         }
-    }
-
-    private String scanSubmenu() {
-        Scanner scanner = new Scanner(System.in);
-        return scanner.nextLine();
     }
 
     private void printMenu(String[] options) {

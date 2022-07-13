@@ -19,7 +19,7 @@ public class StudentService {
     private String firstName = "]\nFirst name: ";
     private String studentId = "Student by ID [";
 
-    public String printAddedToDB(List<Student> student) {
+    public String printCreated(List<Student> student) {
         return "\n" + creadedStudent + "[" + student.get(0).getStudentId() + firstName + student.get(0).getFirstName()
                 + lastName + student.get(0).getLastName();
     }
@@ -30,31 +30,24 @@ public class StudentService {
         for (Group group : groups) {
             result.append("  " + group.getGroupName() + "            " + group.getNamberOfStudents() + "\n");
         }
-        result.append(separatorGroups);
-        return result.toString();
+        return result.append(separatorGroups).toString();
     }
 
     public String printAdded(List<Student> student, List<Course> course) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(studentId + student.get(0).getStudentId() + firstName + student.get(0).getFirstName()
-                + lastName + student.get(0).getLastName() + "\nwas succesefully added to the course: "
-                + course.get(0).getCourseName());
-        return stringBuilder.toString();
+        return studentId + student.get(0).getStudentId() + firstName + student.get(0).getFirstName() + lastName
+                + student.get(0).getLastName() + "\nwas succesefully added to the course: "
+                + course.get(0).getCourseName();
     }
 
     public String printRemoved(List<Student> student, List<Course> course) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(studentId + student.get(0).getStudentId() + firstName + student.get(0).getFirstName()
-                + lastName + student.get(0).getLastName() + "\nwas succesefully removed from the course: "
-                + course.get(0).getCourseName());
-        return stringBuilder.toString();
+        return studentId + student.get(0).getStudentId() + firstName + student.get(0).getFirstName() + lastName
+                + student.get(0).getLastName() + "\nwas succesefully removed from the course: "
+                + course.get(0).getCourseName();
     }
 
     public String printRemovedStudent(List<Student> student) {
-        StringBuilder result = new StringBuilder();
-        result.append(studentId + student.get(0).getStudentId() + firstName + student.get(0).getFirstName() + lastName
-                + student.get(0).getLastName() + "\nwas succesefully removed.");
-        return result.toString();
+        return studentId + student.get(0).getStudentId() + firstName + student.get(0).getFirstName() + lastName
+                + student.get(0).getLastName() + "\nwas succesefully removed.";
     }
 
     public String printCourses(List<Course> courses) {
@@ -63,8 +56,7 @@ public class StudentService {
         for (Course course : courses) {
             result.append(course.getCourseId() + "   |     " + course.getCourseName() + "\n");
         }
-        result.append(separatorCourses);
-        return result.toString();
+        return result.append(separatorCourses).toString();
     }
 
     public String printAll(List<Student> students) {
@@ -74,7 +66,6 @@ public class StudentService {
             result.append(student.getStudentId() + "   |      " + student.getLastName() + "  |   "
                     + student.getFirstName() + "\n");
         }
-        result.append(separatorStudents);
-        return result.toString();
+        return result.append(separatorStudents).toString();
     }
 }

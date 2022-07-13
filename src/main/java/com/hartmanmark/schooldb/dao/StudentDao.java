@@ -23,7 +23,7 @@ public interface StudentDao {
     public void removeStudent(String studentId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException;
 
-    public List<Student> addToDB(String firstName, String lastName)
+    public List<Student> create(String firstName, String lastName)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException;
 
     public List<Student> findStudent(String studentId)

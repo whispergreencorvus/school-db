@@ -7,19 +7,19 @@ import java.sql.SQLException;
 import org.apache.ibatis.jdbc.ScriptRunner;
 
 import com.hartmanmark.schooldb.dao.Connector;
-import com.hartmanmark.schooldb.service.Reader;
+import com.hartmanmark.schooldb.service.ReaderPropertiesFile;
 
 public class DataBaseCreator {
 
-    private Reader reader = new Reader();
+    private ReaderPropertiesFile reader = new ReaderPropertiesFile();
 
-    public void createDataBase() throws ClassNotFoundException, SQLException, IOException, NullPointerException {
+    public void createDataBase() throws SQLException, IOException, NullPointerException {
         ScriptRunner scriptRunner = new ScriptRunner(Connector.getConnection());
         scriptRunner.runScript(readSQLFile());
         reader.read();
     }
 
     private BufferedReader readSQLFile() throws IOException {
-        return new BufferedReader(new FileReader(Reader.readPathProperties("pathToShemaSQLFile")));
+        return new BufferedReader(new FileReader(reader.readPathProperties("pathToShemaSQLFile")));
     }
 }

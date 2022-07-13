@@ -51,10 +51,11 @@ public class StudentDaoImpl implements StudentDao {
             + "ON  school.students_courses.student_id = school.students.student_id JOIN school.courses\n"
             + "ON school.students_courses.course_id = school.courses.course_id\n"
             + "WHERE school.students_courses.student_id = ? ORDER BY course_id;";
-
+    
     public StudentDaoImpl(Validator validator) {
         this.validator = validator;
     }
+
 
     public String countNumber() throws ClassNotFoundException, SQLException, IOException, NullPointerException {
         String numberOfIdStudents = null;
@@ -118,55 +119,56 @@ public class StudentDaoImpl implements StudentDao {
         }
     }
 
-    public List<Student> addToDB(String firstName, String lastName)
+    public List<Student> create(String firstName, String lastName)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException {
         validator.veryfyInputString(firstName);
         validator.veryfyInputString(lastName);
-        List<Student> result = new ArrayList<>();
+        List<Student> students = new ArrayList<>();
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(addToDBQuery)) {
             stmt.setString(1, firstName);
             stmt.setString(2, lastName);
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
-                    result.add(new Student(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3)));
+                    students.add(new Student(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3)));
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        return result;
+        return students;
     }
 
     public List<Group> findGroups() throws ClassNotFoundException, IOException, NullPointerException, SQLException {
-        List<Group> result = new ArrayList<>();
-        try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(findGroupsQuery)) {
+        List<Group> groups = new ArrayList<>();
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(findGroupsQuery)) {
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
-                    result.add(new Group(resultSet.getString(1), resultSet.getString(2)));
+                    groups.add(new Group(resultSet.getString(1), resultSet.getString(2)));
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        return result;
+        return groups;
     }
 
     public List<Student> findInCourse(String course)
             throws ClassNotFoundException, IOException, NullPointerException, SQLException {
         validator.veryfyInputString(course);
-        List<Student> result = new ArrayList<>();
+        List<Student> students = new ArrayList<>();
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(studentsPerGroupQuery + course + orderByIdQuery)) {
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
-                    result.add(new Student(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3)));
+                    students.add(new Student(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3)));
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        return result;
+        return students;
     }
 
     public String countPerCourse(String course)
@@ -199,34 +201,34 @@ public class StudentDaoImpl implements StudentDao {
     public List<Student> findStudent(String studentId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException {
         validator.veryfyRemoveOption(studentId, countNumber());
-        List<Student> result = new ArrayList<>();
+        List<Student> students = new ArrayList<>();
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(findStudentQuery + studentId + ";")) {
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
-                    result.add(new Student(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3)));
+                    students.add(new Student(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3)));
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        return result;
+        return students;
     }
 
     public List<Course> findCourse(String courseId)
             throws ClassNotFoundException, IOException, NullPointerException, SQLException {
-        List<Course> course = new ArrayList<>();
+        List<Course> courses = new ArrayList<>();
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(selectCourseQuery + courseId + ";")) {
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
-                    course.add(new Course(resultSet.getString(1), resultSet.getString(2)));
+                    courses.add(new Course(resultSet.getString(1), resultSet.getString(2)));
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        return course;
+        return courses;
     }
 
     public void removeFromTheCourse(String studentId, String courseId)

@@ -4,7 +4,7 @@ public class Validator {
 
     private static final String REGEX_MENU = "[^w^[1-7]]+";
     private static final String REGEX_INTEGER = "[^w^[0-9]]+";
-    private static final String REGEX_STRING = "[^wd^[a-zA-Z]]+";
+    private static final String REGEX_STRING = "[^[a-zA-Z]]+";
     private String dataIsNull = "Input data is null";
     private String emptyString = "Input string is empty.";
     private String enterIntiger = "Please enter an integer value.";

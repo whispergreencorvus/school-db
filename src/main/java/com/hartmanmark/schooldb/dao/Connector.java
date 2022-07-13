@@ -5,19 +5,16 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import com.hartmanmark.schooldb.service.Reader;
+import com.hartmanmark.schooldb.service.ReaderPropertiesFile;
 
 public class Connector {
 
-    public static Connection getConnection() throws ClassNotFoundException, IOException, SQLException {
+    public static Connection getConnection() throws IOException, SQLException {
         Connection connection = null;
         try {
-            connection = DriverManager.getConnection(Reader.readDataBaseProperties("url").toString(),
-                    Reader.readDataBaseProperties("user").toString(),
-                    Reader.readDataBaseProperties("password").toString());
-            if (connection == null) {
-                throw new NullPointerException("Failed to make connection. Connection is NULL");
-            }
+            connection = DriverManager.getConnection(ReaderPropertiesFile.readDataBaseProperties("url").toString(),
+                    ReaderPropertiesFile.readDataBaseProperties("user").toString(),
+                    ReaderPropertiesFile.readDataBaseProperties("password").toString());
         } catch (SQLException e) {
             throw new SQLException(e);
         }

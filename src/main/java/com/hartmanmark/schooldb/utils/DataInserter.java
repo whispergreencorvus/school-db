@@ -10,12 +10,12 @@ import java.sql.Statement;
 import org.apache.ibatis.jdbc.ScriptRunner;
 
 import com.hartmanmark.schooldb.dao.Connector;
-import com.hartmanmark.schooldb.service.Reader;
+import com.hartmanmark.schooldb.service.ReaderPropertiesFile;
 
 public class DataInserter {
-
+    
     public void insertStudents(StringBuilder firstName)
-            throws SQLException, ClassNotFoundException, IOException, NullPointerException {
+            throws SQLException, IOException, NullPointerException {
         try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
             stmt.executeUpdate(firstName.toString());
         } catch (SQLException e) {
@@ -24,7 +24,7 @@ public class DataInserter {
     }
 
     public void insertGroups(String groupName)
-            throws SQLException, ClassNotFoundException, IOException, NullPointerException {
+            throws SQLException, IOException, NullPointerException {
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn
                         .prepareStatement("INSERT INTO school.groups(GROUP_ID, GROUP_NAME) VALUES (DEFAULT , ?);")) {
@@ -35,12 +35,12 @@ public class DataInserter {
         }
     }
 
-    public void insertCourses() throws SQLException, ClassNotFoundException, IOException, NullPointerException {
+    public void insertCourses() throws SQLException, IOException, NullPointerException {
         ScriptRunner scriptRunner = new ScriptRunner(Connector.getConnection());
         scriptRunner.runScript(readSQLFile());
     }
 
     private BufferedReader readSQLFile() throws IOException {
-        return new BufferedReader(new FileReader(Reader.readPathProperties("pathToDataSQLFile")));
+        return new BufferedReader(new FileReader(ReaderPropertiesFile.readPathProperties("pathToDataSQLFile")));
     }
 }
