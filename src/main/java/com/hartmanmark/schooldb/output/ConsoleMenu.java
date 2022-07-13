@@ -2,11 +2,12 @@ package com.hartmanmark.schooldb.output;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.StudentDao;
+import com.hartmanmark.schooldb.dao.StudentDaoAdditional;
 import com.hartmanmark.schooldb.dao.StudentDaoImpl;
 import com.hartmanmark.schooldb.input.InputData;
+import com.hartmanmark.schooldb.service.ConsoleReader;
 import com.hartmanmark.schooldb.service.StudentService;
 import com.hartmanmark.schooldb.validator.Validator;
 
@@ -20,8 +21,10 @@ public class ConsoleMenu {
     private String separator = String.format("%100s", "").replace(' ', '-') + "\n";
     private Validator validator = new Validator();
     private StudentDao studentDao = new StudentDaoImpl(validator);
+    private StudentDaoAdditional daoAdditional = new StudentDaoImpl(validator);
     private StudentService studentService = new StudentService();
-    private InputData inputData = new InputData(studentDao, studentService);
+    private ConsoleReader reader = new ConsoleReader();
+    private InputData inputData = new InputData(studentDao, studentService, reader, daoAdditional);
 
     public void runConsole() throws ClassNotFoundException, SQLException, IOException, NullPointerException {
         System.out.print(separator + "\n" + welcom);
@@ -29,14 +32,24 @@ public class ConsoleMenu {
         while (true) {
             try {
                 printMenu(options);
-                Scanner scanner = new Scanner(System.in);
-                number = scanner.nextLine();
+                number = reader.read();
                 validator.verifyMenuChoose(number);
-                if (number.equals("7")) {
+                if (number.equals("1")) {
+                    System.out.print(inputData.findGroups());
+                } else if (number.equals("2")) {
+                    System.out.print(inputData.findStudentsInCourse());
+                } else if (number.equals("3")) {
+                    System.out.print(inputData.addStudent());
+                } else if (number.equals("4")) {
+                    System.out.print(inputData.deleteStudent());
+                } else if (number.equals("5")) {
+                    System.out.print(inputData.addStudentToTheCourse());
+                } else if (number.equals("6")) {
+                    System.out.print(inputData.removeStudentFromTheCourse());
+                } else if (number.equals("7")) {
                     System.out.println("Exit");
                     break;
                 }
-                inputData.input(number);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException(e);
             }

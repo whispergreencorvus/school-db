@@ -20,6 +20,6 @@ public class DataBaseCreator {
     }
 
     private BufferedReader readSQLFile() throws IOException {
-        return new BufferedReader(new FileReader(reader.readPathProperties("pathToShemaSQLFile")));
+        return new BufferedReader(new FileReader(ReaderPropertiesFile.readPathProperties("pathToShemaSQLFile")));
     }
 }

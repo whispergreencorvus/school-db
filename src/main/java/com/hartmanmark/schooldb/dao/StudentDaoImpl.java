@@ -13,7 +13,7 @@ import com.hartmanmark.schooldb.model.Group;
 import com.hartmanmark.schooldb.model.Student;
 import com.hartmanmark.schooldb.validator.Validator;
 
-public class StudentDaoImpl implements StudentDao {
+public class StudentDaoImpl implements StudentDao, StudentDaoAdditional {
 
     private Validator validator;
     private String courseQuery = "SELECT course_id, course_name FROM school.courses ORDER BY course_id ;";
@@ -186,7 +186,7 @@ public class StudentDaoImpl implements StudentDao {
         return quantity;
     }
 
-    public void removeStudent(String studentId)
+    public String removeStudent(String studentId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException {
         Integer studentIdInt = Integer.parseInt(studentId);
         try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
@@ -195,6 +195,7 @@ public class StudentDaoImpl implements StudentDao {
         } catch (SQLException e) {
             throw new SQLException(e);
         }
+        return studentId;
     }
 
     public List<Student> findStudent(String studentId)

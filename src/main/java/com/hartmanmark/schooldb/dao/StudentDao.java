@@ -10,8 +10,6 @@ import com.hartmanmark.schooldb.model.Student;
 
 public interface StudentDao {
 
-    public List<Group> findGroups() throws ClassNotFoundException, IOException, NullPointerException, SQLException;
-
     public List<Student> findInCourse(String course)
             throws ClassNotFoundException, IOException, NullPointerException, SQLException;
 
@@ -20,7 +18,7 @@ public interface StudentDao {
     public void removeFromTheCourse(String studentId, String courseId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException;
 
-    public void removeStudent(String studentId)
+    public String removeStudent(String studentId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException;
 
     public List<Student> create(String firstName, String lastName)
@@ -33,15 +31,6 @@ public interface StudentDao {
             throws SQLException, ClassNotFoundException, IOException, NullPointerException;
 
     public void addToTheCourse(String firstName, String lastName)
-            throws ClassNotFoundException, IOException, NullPointerException, SQLException;
-
-    public List<Course> findCourse(String courseId)
-            throws ClassNotFoundException, IOException, NullPointerException, SQLException;
-
-    public List<Course> createListOfCourses()
-            throws ClassNotFoundException, IOException, NullPointerException, SQLException;
-
-    public List<Course> createCorsesListPerStudent(String studentId)
             throws ClassNotFoundException, IOException, NullPointerException, SQLException;
 
     public List<Student> createListOfStudents()

@@ -2,11 +2,11 @@ package com.hartmanmark.schooldb.input;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.StudentDao;
+import com.hartmanmark.schooldb.dao.StudentDaoAdditional;
+import com.hartmanmark.schooldb.service.ConsoleReader;
 import com.hartmanmark.schooldb.service.StudentService;
-import com.hartmanmark.schooldb.validator.Validator;
 
 public class InputData {
 
@@ -20,78 +20,62 @@ public class InputData {
     private String studentsOnCourse = "Students on the course: ";
     private StudentDao studentDao;
     private StudentService studentService;
+    private ConsoleReader reader;
+    private StudentDaoAdditional daoAdditional;
 
-    public void input(String inputData) throws ClassNotFoundException, NullPointerException, SQLException, IOException {
-        if (inputData.equals("1")) {
-            findGroups();
-        } else if (inputData.equals("2")) {
-            findStudentsInCourse();
-        } else if (inputData.equals("3")) {
-            addStudent();
-        } else if (inputData.equals("4")) {
-            deleteStudent();
-        } else if (inputData.equals("5")) {
-            addStudentToTheCourse();
-        } else if (inputData.equals("6")) {
-            removeStudentFromTheCourse();
-        }
-    }
-
-    public InputData(StudentDao studentDaoImpl, StudentService studentService) {
+    public InputData(StudentDao studentDaoImpl, StudentService studentService, ConsoleReader reader, StudentDaoAdditional daoAdditional) {
         super();
         this.studentDao = studentDaoImpl;
         this.studentService = studentService;
+        this.reader = reader;
+        this.daoAdditional = daoAdditional;
     }
 
-    private void findGroups() throws ClassNotFoundException, NullPointerException, IOException, SQLException {
-        System.out.println(studentService.printFindedGroups(studentDao.findGroups()));
+    public String findGroups() throws ClassNotFoundException, NullPointerException, IOException, SQLException {
+        return studentService.printFindedGroups(daoAdditional.findGroups()) + "\n";
     }
 
-    private void findStudentsInCourse() throws ClassNotFoundException, NullPointerException, IOException, SQLException {
+    public String findStudentsInCourse()
+            throws ClassNotFoundException, NullPointerException, IOException, SQLException {
         System.out.println(enterCourse);
-        String course = scanSubmenu();
-        System.out.println(studentService.printAll(studentDao.findInCourse(course)));
-        System.out.println(studentsOnCourse + studentDao.countPerCourse(course));
+        String course = reader.read();
+        return studentService.printAll(studentDao.findInCourse(course)) + "\n" + studentsOnCourse
+                + studentDao.countPerCourse(course) + "\n";
     }
 
-    private String addStudent() throws ClassNotFoundException, NullPointerException, SQLException, IOException {
+    public String addStudent() throws ClassNotFoundException, NullPointerException, SQLException, IOException {
         System.out.println(enterFirstName + "\n");
-        String firstName = scanSubmenu();
+        String firstName = reader.read();
         System.out.println(enterLastName + "\n");
-        String lastName = scanSubmenu();
-        return studentService.printCreated(studentDao.create(firstName, lastName));
+        String lastName = reader.read();
+        return studentService.printCreated(studentDao.create(firstName, lastName)) + "\n";
     }
 
-    private void deleteStudent() throws ClassNotFoundException, NullPointerException, SQLException, IOException {
+    public String deleteStudent() throws ClassNotFoundException, NullPointerException, SQLException, IOException {
         System.out.println(enterStudentIdBetween + studentDao.countNumber());
-        String studentId = scanSubmenu();
-        System.out.println(studentService.printRemovedStudent(studentDao.findStudent(studentId)));
+        String studentId = reader.read();
+        String deletedStudent = studentService.printRemovedStudent(studentDao.findStudent(studentId)) + "\n";
         studentDao.removeStudent(studentId);
+        return deletedStudent;
     }
 
-    private void addStudentToTheCourse()
+    public String addStudentToTheCourse()
             throws ClassNotFoundException, NullPointerException, IOException, SQLException {
         System.out.println(studentService.printAll(studentDao.createListOfStudents()) + enterStudentId);
-        String studentId = scanSubmenu();
-        System.out.println(studentService.printCourses(studentDao.createListOfCourses()) + enterCOurseId);
-        String courseId = scanSubmenu();
+        String studentId = reader.read();
+        System.out.println(studentService.printCourses(daoAdditional.createListOfCourses()) + enterCOurseId);
+        String courseId = reader.read();
         studentDao.addToTheCourse(studentId, courseId);
-        System.out
-                .println(studentService.printAdded(studentDao.findStudent(studentId), studentDao.findCourse(courseId)));
+        return studentService.printAdded(studentDao.findStudent(studentId), daoAdditional.findCourse(courseId)) + "\n";
     }
 
-    private void removeStudentFromTheCourse()
+    public String removeStudentFromTheCourse()
             throws ClassNotFoundException, NullPointerException, SQLException, IOException {
         System.out.println(studentService.printAll(studentDao.createListOfStudents()) + enterStudentId);
-        String studentId = scanSubmenu();
-        System.out.println(studentService.printCourses(studentDao.createCorsesListPerStudent(studentId)));
-        String courseId = scanSubmenu();
+        String studentId = reader.read();
+        System.out.println(studentService.printCourses(daoAdditional.createCorsesListPerStudent(studentId)));
+        String courseId = reader.read();
         studentDao.removeFromTheCourse(studentId, courseId);
-        System.out.println(
-                studentService.printRemoved(studentDao.findStudent(studentId), studentDao.findCourse(courseId)));
-    }
-
-    private String scanSubmenu() {
-        return new Scanner(System.in).nextLine();
+        return studentService.printRemoved(studentDao.findStudent(studentId), daoAdditional.findCourse(courseId)) + "\n";
     }
 }

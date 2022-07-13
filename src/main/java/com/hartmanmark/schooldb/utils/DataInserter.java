@@ -13,7 +13,7 @@ import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.service.ReaderPropertiesFile;
 
 public class DataInserter {
-    
+
     public void insertStudents(StringBuilder firstName)
             throws SQLException, IOException, NullPointerException {
         try (Connection conn = Connector.getConnection(); Statement stmt = conn.createStatement();) {
