@@ -5,11 +5,10 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.StudentDao;
-import com.hartmanmark.schooldb.dao.StudentDaoImpl;
 import com.hartmanmark.schooldb.service.StudentService;
 import com.hartmanmark.schooldb.validator.Validator;
 
-public class Input {
+public class InputData {
 
     private String enterCourse = "Enter the course (Chemistry, Biology, Physics, Astronomy, History, "
             + "Anthropology, Geography, Mathematics, Philosophy, Linguistics)";
@@ -19,37 +18,59 @@ public class Input {
     private String enterStudentId = "\nPlease enter student ID: ";
     private String enterCOurseId = "\nPlease enter course ID: ";
     private String studentsOnCourse = "Students on the course: ";
-    private Validator validator = new Validator();
-    private StudentDao studentDao = new StudentDaoImpl(validator);
-    private StudentService studentService = new StudentService();
+    private StudentDao studentDao;
+    private StudentService studentService;
 
-    public void findGroups() throws ClassNotFoundException, NullPointerException, IOException, SQLException {
+    public void input(String inputData) throws ClassNotFoundException, NullPointerException, SQLException, IOException {
+        if (inputData.equals("1")) {
+            findGroups();
+        } else if (inputData.equals("2")) {
+            findStudentsInCourse();
+        } else if (inputData.equals("3")) {
+            addStudent();
+        } else if (inputData.equals("4")) {
+            deleteStudent();
+        } else if (inputData.equals("5")) {
+            addStudentToTheCourse();
+        } else if (inputData.equals("6")) {
+            removeStudentFromTheCourse();
+        }
+    }
+
+    public InputData(StudentDao studentDaoImpl, StudentService studentService) {
+        super();
+        this.studentDao = studentDaoImpl;
+        this.studentService = studentService;
+    }
+
+    private void findGroups() throws ClassNotFoundException, NullPointerException, IOException, SQLException {
         System.out.println(studentService.printFindedGroups(studentDao.findGroups()));
     }
 
-    public void findStudentsInCourse() throws ClassNotFoundException, NullPointerException, IOException, SQLException {
+    private void findStudentsInCourse() throws ClassNotFoundException, NullPointerException, IOException, SQLException {
         System.out.println(enterCourse);
         String course = scanSubmenu();
         System.out.println(studentService.printAll(studentDao.findInCourse(course)));
         System.out.println(studentsOnCourse + studentDao.countPerCourse(course));
     }
 
-    public void addStudent() throws ClassNotFoundException, NullPointerException, SQLException, IOException {
+    private String addStudent() throws ClassNotFoundException, NullPointerException, SQLException, IOException {
         System.out.println(enterFirstName + "\n");
         String firstName = scanSubmenu();
         System.out.println(enterLastName + "\n");
         String lastName = scanSubmenu();
-        System.out.println(studentService.printCreated(studentDao.create(firstName, lastName)));
+        return studentService.printCreated(studentDao.create(firstName, lastName));
     }
 
-    public void deleteStudent() throws ClassNotFoundException, NullPointerException, SQLException, IOException {
+    private void deleteStudent() throws ClassNotFoundException, NullPointerException, SQLException, IOException {
         System.out.println(enterStudentIdBetween + studentDao.countNumber());
         String studentId = scanSubmenu();
         System.out.println(studentService.printRemovedStudent(studentDao.findStudent(studentId)));
         studentDao.removeStudent(studentId);
     }
 
-    public void addStudentToTheCourse() throws ClassNotFoundException, NullPointerException, IOException, SQLException {
+    private void addStudentToTheCourse()
+            throws ClassNotFoundException, NullPointerException, IOException, SQLException {
         System.out.println(studentService.printAll(studentDao.createListOfStudents()) + enterStudentId);
         String studentId = scanSubmenu();
         System.out.println(studentService.printCourses(studentDao.createListOfCourses()) + enterCOurseId);
@@ -59,7 +80,7 @@ public class Input {
                 .println(studentService.printAdded(studentDao.findStudent(studentId), studentDao.findCourse(courseId)));
     }
 
-    public void removeStudentFromTheCourse()
+    private void removeStudentFromTheCourse()
             throws ClassNotFoundException, NullPointerException, SQLException, IOException {
         System.out.println(studentService.printAll(studentDao.createListOfStudents()) + enterStudentId);
         String studentId = scanSubmenu();
@@ -73,5 +94,4 @@ public class Input {
     private String scanSubmenu() {
         return new Scanner(System.in).nextLine();
     }
-
 }

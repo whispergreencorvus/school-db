@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 import com.hartmanmark.schooldb.dao.StudentDao;
 import com.hartmanmark.schooldb.dao.StudentDaoImpl;
-import com.hartmanmark.schooldb.input.Input;
+import com.hartmanmark.schooldb.input.InputData;
 import com.hartmanmark.schooldb.service.StudentService;
 import com.hartmanmark.schooldb.validator.Validator;
 
@@ -19,33 +19,24 @@ public class ConsoleMenu {
     private String welcom = "Welcom to simple sql-jdbc-school app.";
     private String separator = String.format("%100s", "").replace(' ', '-') + "\n";
     private Validator validator = new Validator();
-    private Input input = new Input();
+    private StudentDao studentDao = new StudentDaoImpl(validator);
+    private StudentService studentService = new StudentService();
+    private InputData inputData = new InputData(studentDao, studentService);
 
     public void runConsole() throws ClassNotFoundException, SQLException, IOException, NullPointerException {
         System.out.print(separator + "\n" + welcom);
-        String inputData;
+        String number;
         while (true) {
             try {
                 printMenu(options);
                 Scanner scanner = new Scanner(System.in);
-                inputData = scanner.nextLine();
-                validator.verifyMenuChoose(inputData);
-                if (inputData.equals("1")) {
-                    input.findGroups();
-                } else if (inputData.equals("2")) {
-                    input.findStudentsInCourse();
-                } else if (inputData.equals("3")) {
-                    input.addStudent();
-                } else if (inputData.equals("4")) {
-                    input.deleteStudent();
-                } else if (inputData.equals("5")) {
-                    input.addStudentToTheCourse();
-                } else if (inputData.equals("6")) {
-                    input.removeStudentFromTheCourse();
-                } else if (inputData.equals("7")) {
+                number = scanner.nextLine();
+                validator.verifyMenuChoose(number);
+                if (number.equals("7")) {
                     System.out.println("Exit");
                     break;
                 }
+                inputData.input(number);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException(e);
             }

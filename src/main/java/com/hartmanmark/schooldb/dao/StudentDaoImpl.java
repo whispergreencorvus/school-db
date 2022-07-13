@@ -51,11 +51,10 @@ public class StudentDaoImpl implements StudentDao {
             + "ON  school.students_courses.student_id = school.students.student_id JOIN school.courses\n"
             + "ON school.students_courses.course_id = school.courses.course_id\n"
             + "WHERE school.students_courses.student_id = ? ORDER BY course_id;";
-    
+
     public StudentDaoImpl(Validator validator) {
         this.validator = validator;
     }
-
 
     public String countNumber() throws ClassNotFoundException, SQLException, IOException, NullPointerException {
         String numberOfIdStudents = null;
