@@ -19,4 +19,9 @@ public interface StudentDaoAdditional {
             throws ClassNotFoundException, IOException, NullPointerException, SQLException;
 
     public List<Group> findGroups() throws ClassNotFoundException, IOException, NullPointerException, SQLException;
+
+    public String countPerCourse(String course)
+            throws SQLException, ClassNotFoundException, IOException, NullPointerException;
+
+    public String countNumber() throws ClassNotFoundException, SQLException, IOException, NullPointerException;
 }

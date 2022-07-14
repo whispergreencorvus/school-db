@@ -23,7 +23,8 @@ public class InputData {
     private ConsoleReader reader;
     private StudentDaoAdditional daoAdditional;
 
-    public InputData(StudentDao studentDaoImpl, StudentService studentService, ConsoleReader reader, StudentDaoAdditional daoAdditional) {
+    public InputData(StudentDao studentDaoImpl, StudentService studentService, ConsoleReader reader,
+            StudentDaoAdditional daoAdditional) {
         super();
         this.studentDao = studentDaoImpl;
         this.studentService = studentService;
@@ -40,7 +41,7 @@ public class InputData {
         System.out.println(enterCourse);
         String course = reader.read();
         return studentService.printAll(studentDao.findInCourse(course)) + "\n" + studentsOnCourse
-                + studentDao.countPerCourse(course) + "\n";
+                + daoAdditional.countPerCourse(course) + "\n";
     }
 
     public String addStudent() throws ClassNotFoundException, NullPointerException, SQLException, IOException {
@@ -52,7 +53,7 @@ public class InputData {
     }
 
     public String deleteStudent() throws ClassNotFoundException, NullPointerException, SQLException, IOException {
-        System.out.println(enterStudentIdBetween + studentDao.countNumber());
+        System.out.println(enterStudentIdBetween + daoAdditional.countNumber());
         String studentId = reader.read();
         String deletedStudent = studentService.printRemovedStudent(studentDao.findStudent(studentId)) + "\n";
         studentDao.removeStudent(studentId);
@@ -76,6 +77,7 @@ public class InputData {
         System.out.println(studentService.printCourses(daoAdditional.createCorsesListPerStudent(studentId)));
         String courseId = reader.read();
         studentDao.removeFromTheCourse(studentId, courseId);
-        return studentService.printRemoved(studentDao.findStudent(studentId), daoAdditional.findCourse(courseId)) + "\n";
+        return studentService.printRemoved(studentDao.findStudent(studentId), daoAdditional.findCourse(courseId))
+                + "\n";
     }
 }

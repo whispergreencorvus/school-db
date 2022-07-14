@@ -13,8 +13,6 @@ public interface StudentDao {
     public List<Student> findInCourse(String course)
             throws ClassNotFoundException, IOException, NullPointerException, SQLException;
 
-    public String countNumber() throws ClassNotFoundException, SQLException, IOException, NullPointerException;
-
     public void removeFromTheCourse(String studentId, String courseId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException;
 
@@ -26,9 +24,6 @@ public interface StudentDao {
 
     public List<Student> findStudent(String studentId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException;
-
-    public String countPerCourse(String course)
-            throws SQLException, ClassNotFoundException, IOException, NullPointerException;
 
     public void addToTheCourse(String firstName, String lastName)
             throws ClassNotFoundException, IOException, NullPointerException, SQLException;
