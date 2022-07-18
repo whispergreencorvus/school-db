@@ -55,9 +55,7 @@ public class InputData {
     public String deleteStudent() throws ClassNotFoundException, NullPointerException, SQLException, IOException {
         System.out.println(enterStudentIdBetween + daoAdditional.countNumber());
         String studentId = reader.read();
-        String deletedStudent = studentService.printRemovedStudent(studentDao.findStudent(studentId)) + "\n";
-        studentDao.removeStudent(studentId);
-        return deletedStudent;
+        return studentService.printRemovedStudent(studentDao.removeStudent(studentId)) + "\n";
     }
 
     public String addStudentToTheCourse()

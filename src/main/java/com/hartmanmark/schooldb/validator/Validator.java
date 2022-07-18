@@ -3,9 +3,13 @@ package com.hartmanmark.schooldb.validator;
 public class Validator {
 
     private static final String REGEX_MENU = "[^w^[1-7]]+";
-    private static final String REGEX_INTEGER = "[^w^[0-9]]+";
-    private static final String REGEX_STRING = "[^[a-zA-Z]]+";
+    private static final String REGEX_SYMBOLS = "^(?=.*[-+_!@#$%^&*., ?]).+$";
+    private static final String REGEX_NUMERIC = "^(?=.*[0-9]).+$";
+    private static final String REGEX_LETTER = "^(?=.*[A-Za-z]).+$";
     private String dataIsNull = "Input data is null";
+    private String dataIsSymbol = "Input data contains symbol";
+    private String dataIsNumeric = "Input data contains numeric";
+    private String dataIsLetter = "Input data contains letter";
     private String emptyString = "Input string is empty.";
     private String enterIntiger = "Please enter an integer value.";
     private String oneCharacter = "Input must be contain only one character";
@@ -34,7 +38,10 @@ public class Validator {
         if (input.isEmpty()) {
             throw new IllegalArgumentException(emptyString);
         }
-        if (input.matches(REGEX_INTEGER)) {
+        if (input.matches(REGEX_SYMBOLS)) {
+            throw new IllegalArgumentException(enterIntiger);
+        }
+        if (input.matches(REGEX_LETTER)) {
             throw new IllegalArgumentException(enterIntiger);
         }
     }
@@ -46,8 +53,11 @@ public class Validator {
         if (input.isEmpty()) {
             throw new IllegalArgumentException(emptyString);
         }
-        if (input.matches(REGEX_INTEGER)) {
-            throw new IllegalArgumentException(enterIntiger);
+        if (input.matches(REGEX_SYMBOLS)) {
+            throw new IllegalArgumentException(dataIsSymbol);
+        }
+        if (input.matches(REGEX_LETTER)) {
+            throw new IllegalArgumentException(dataIsLetter);
         }
         int inputID = Integer.parseInt(input);
         Integer numOfStudentsInt = Integer.parseInt(numberOfStudents);
@@ -63,8 +73,11 @@ public class Validator {
         if (input.isEmpty()) {
             throw new IllegalArgumentException(emptyString);
         }
-        if (input.matches(REGEX_STRING)) {
-            throw new IllegalArgumentException(enterIntiger);
+        if (input.matches(REGEX_SYMBOLS)) {
+            throw new IllegalArgumentException(dataIsSymbol);
+        }
+        if (input.matches(REGEX_NUMERIC)) {
+            throw new IllegalArgumentException(dataIsNumeric);
         }
     }
 }

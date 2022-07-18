@@ -41,7 +41,7 @@ public class StudentDaoImpl implements StudentDao, StudentDaoAdditional {
     private String selectCourseQuery = "SELECT school.courses.course_id, school.courses.course_name "
             + "FROM school.courses WHERE school.courses.course_id = ";
     private String countOfStudentsQuery = "SELECT count(*) from school.students;";
-    private String deleteQuery = "DELETE FROM school.students WHERE STUDENT_ID = ?;";
+    private String deleteQuery = "DELETE FROM school.students WHERE STUDENT_ID = ? RETURNING * ;";
     private String findStudentQuery = "SELECT school.students.student_id, school.students.first_name, school.students.last_name "
             + "FROM school.students WHERE school.students.student_id = ";
     private String deleteFromTheCourseQuery = "DELETE FROM school.students_courses "
@@ -186,16 +186,21 @@ public class StudentDaoImpl implements StudentDao, StudentDaoAdditional {
         return quantity;
     }
 
-    public String removeStudent(String studentId)
+    public List<Student> removeStudent(String studentId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException {
         Integer studentIdInt = Integer.parseInt(studentId);
+        List<Student> students = new ArrayList<>();
         try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
             stmt.setInt(1, studentIdInt);
-            stmt.executeUpdate();
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    students.add(new Student(resultSet.getString(1), resultSet.getString(3), resultSet.getString(4)));
+                }
+            }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        return studentId;
+        return students;
     }
 
     public List<Student> findStudent(String studentId)
