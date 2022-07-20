@@ -233,20 +233,17 @@ public class StudentDaoImpl implements StudentDao, StudentDaoAdditional {
             throws ClassNotFoundException, SQLException, IOException, NullPointerException {
         Integer studentIdInt = Integer.parseInt(studentId);
         List<Student> student = new ArrayList<>();
-//        String removedId = null;
         try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
             stmt.setInt(1, studentIdInt);
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
                     student.add(new Student(resultSet.getString(1), resultSet.getString(3), resultSet.getString(4)));
-//                    removedId = resultSet.getString(1);
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
         return student;
-//        return removedId;
     }
 
     public String removeFromTheCourse(String studentId, String courseId)

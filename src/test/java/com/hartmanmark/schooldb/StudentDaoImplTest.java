@@ -74,6 +74,24 @@ class StudentDaoImplTest {
         return studentId;
     }
 
+    private String findStudent(String id) throws SQLException, IOException {
+        String studentId = null;
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT school.students.student_id FROM school.students WHERE school.students.student_id = ?")) {
+            int idAsInt = Integer.parseInt(id);
+            stmt.setInt(1, idAsInt);
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    studentId = resultSet.getString(1);
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        }
+        return studentId;
+    }
+
     @Test
     void addToTheCourse_getIllegalArgumentException_whenInputDataIsNull()
             throws ClassNotFoundException, NullPointerException, IOException, SQLException {
@@ -166,7 +184,6 @@ class StudentDaoImplTest {
             throws ClassNotFoundException, NullPointerException, IOException, SQLException {
         String studentId = "25";
         studentDaoImpl.removeStudent(studentId);
-        List<String> emptyArray = new ArrayList<String>();
-        assertEquals(emptyArray, studentDaoImpl.findStudent(studentId));
+        assertNull(findStudent(studentId));
     }
 }
