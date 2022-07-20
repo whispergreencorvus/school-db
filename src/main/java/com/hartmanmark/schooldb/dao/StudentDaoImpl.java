@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class StudentDaoImpl implements StudentDao, StudentDaoAdditional {
     private String findStudentQuery = "SELECT school.students.student_id, school.students.first_name, school.students.last_name "
             + "FROM school.students WHERE school.students.student_id = ";
     private String deleteFromTheCourseQuery = "DELETE FROM school.students_courses "
-            + "WHERE school.students_courses.student_id = ? AND school.students_courses.course_id = ? ;";
+            + "WHERE school.students_courses.student_id = ? AND school.students_courses.course_id = ? RETURNING id;";
     private String createStudentsListPerCourseQuery = "SELECT school.students_courses.course_id, course_name\n"
             + "FROM school.students JOIN school.students_courses \n"
             + "ON  school.students_courses.student_id = school.students.student_id JOIN school.courses\n"
@@ -102,40 +103,48 @@ public class StudentDaoImpl implements StudentDao, StudentDaoAdditional {
         return courses;
     }
 
-    public void addToTheCourse(String studentId, String courseId)
+    public String addToTheCourse(String studentId, String courseId)
             throws ClassNotFoundException, IOException, NullPointerException, SQLException {
         validator.verifyInteger(studentId);
         validator.verifyInteger(courseId);
         Integer studentIdInt = Integer.parseInt(studentId);
         Integer courseIdInt = Integer.parseInt(courseId);
+        String studentInCourseId = null;
         try (Connection conn = Connector.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(addToCourseTheQuery)) {
+                PreparedStatement stmt = conn.prepareStatement(addToCourseTheQuery, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, studentIdInt);
             stmt.setInt(2, courseIdInt);
             stmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new SQLException(e);
-        }
-    }
-
-    public List<Student> create(String firstName, String lastName)
-            throws ClassNotFoundException, SQLException, IOException, NullPointerException {
-        validator.veryfyInputString(firstName);
-        validator.veryfyInputString(lastName);
-        List<Student> students = new ArrayList<>();
-        try (Connection conn = Connector.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(addToDBQuery)) {
-            stmt.setString(1, firstName);
-            stmt.setString(2, lastName);
-            try (ResultSet resultSet = stmt.executeQuery()) {
+            try (ResultSet resultSet = stmt.getGeneratedKeys()) {
                 while (resultSet.next()) {
-                    students.add(new Student(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3)));
+                    studentInCourseId = resultSet.getString(1);
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        return students;
+        return studentInCourseId;
+    }
+
+    public String create(String firstName, String lastName)
+            throws ClassNotFoundException, SQLException, IOException, NullPointerException {
+        validator.veryfyInputString(firstName);
+        validator.veryfyInputString(lastName);
+        String studentId = null;
+        try (Connection conn = Connector.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(addToDBQuery, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, firstName);
+            stmt.setString(2, lastName);
+            stmt.executeUpdate();
+            try (ResultSet resultSet = stmt.getGeneratedKeys()) {
+                while (resultSet.next()) {
+                    studentId = resultSet.getString(1);
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        }
+        return studentId;
     }
 
     public List<Group> findGroups() throws ClassNotFoundException, IOException, NullPointerException, SQLException {
@@ -186,23 +195,6 @@ public class StudentDaoImpl implements StudentDao, StudentDaoAdditional {
         return quantity;
     }
 
-    public List<Student> removeStudent(String studentId)
-            throws ClassNotFoundException, SQLException, IOException, NullPointerException {
-        Integer studentIdInt = Integer.parseInt(studentId);
-        List<Student> students = new ArrayList<>();
-        try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
-            stmt.setInt(1, studentIdInt);
-            try (ResultSet resultSet = stmt.executeQuery()) {
-                while (resultSet.next()) {
-                    students.add(new Student(resultSet.getString(1), resultSet.getString(3), resultSet.getString(4)));
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLException(e);
-        }
-        return students;
-    }
-
     public List<Student> findStudent(String studentId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException {
         validator.veryfyRemoveOption(studentId, countNumber());
@@ -222,6 +214,7 @@ public class StudentDaoImpl implements StudentDao, StudentDaoAdditional {
 
     public List<Course> findCourse(String courseId)
             throws ClassNotFoundException, IOException, NullPointerException, SQLException {
+        validator.verifyInteger(courseId);
         List<Course> courses = new ArrayList<>();
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(selectCourseQuery + courseId + ";")) {
@@ -236,20 +229,46 @@ public class StudentDaoImpl implements StudentDao, StudentDaoAdditional {
         return courses;
     }
 
-    public void removeFromTheCourse(String studentId, String courseId)
+    public List<Student> removeStudent(String studentId)
+            throws ClassNotFoundException, SQLException, IOException, NullPointerException {
+        Integer studentIdInt = Integer.parseInt(studentId);
+        List<Student> student = new ArrayList<>();
+//        String removedId = null;
+        try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
+            stmt.setInt(1, studentIdInt);
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    student.add(new Student(resultSet.getString(1), resultSet.getString(3), resultSet.getString(4)));
+//                    removedId = resultSet.getString(1);
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLException(e);
+        }
+        return student;
+//        return removedId;
+    }
+
+    public String removeFromTheCourse(String studentId, String courseId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException {
         validator.verifyInteger(courseId);
         validator.verifyInteger(studentId);
         Integer studentIdInt = Integer.parseInt(studentId);
         Integer courseIdInt = Integer.parseInt(courseId);
+        String removedId = null;
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(deleteFromTheCourseQuery)) {
             stmt.setInt(1, studentIdInt);
             stmt.setInt(2, courseIdInt);
-            stmt.executeUpdate();
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    removedId = resultSet.getString(1);
+                }
+            }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
+        return removedId;
     }
 
     public List<Course> createCorsesListPerStudent(String studentId)

@@ -11,19 +11,19 @@ public interface StudentDao {
     public List<Student> findInCourse(String course)
             throws ClassNotFoundException, IOException, NullPointerException, SQLException;
 
-    public void removeFromTheCourse(String studentId, String courseId)
+    public String removeFromTheCourse(String studentId, String courseId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException;
 
     public List<Student> removeStudent(String studentId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException;
 
-    public List<Student> create(String firstName, String lastName)
+    public String create(String firstName, String lastName)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException;
 
     public List<Student> findStudent(String studentId)
             throws ClassNotFoundException, SQLException, IOException, NullPointerException;
 
-    public void addToTheCourse(String firstName, String lastName)
+    public String addToTheCourse(String firstName, String lastName)
             throws ClassNotFoundException, IOException, NullPointerException, SQLException;
 
     public List<Student> createListOfStudents()

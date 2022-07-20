@@ -2,7 +2,7 @@ package com.hartmanmark.schooldb.validator;
 
 public class Validator {
 
-    private static final String REGEX_MENU = "[^w^[1-7]]+";
+    private static final String REGEX_RANGE = "[[8-90]]+";
     private static final String REGEX_SYMBOLS = "^(?=.*[-+_!@#$%^&*., ?]).+$";
     private static final String REGEX_NUMERIC = "^(?=.*[0-9]).+$";
     private static final String REGEX_LETTER = "^(?=.*[A-Za-z]).+$";
@@ -23,8 +23,15 @@ public class Validator {
         if (input.isEmpty()) {
             throw new IllegalArgumentException(emptyString);
         }
-        if (input.matches(REGEX_MENU)) {
+        if (input.matches(REGEX_RANGE)) {
             throw new IllegalArgumentException(valueRange);
+
+        }
+        if (input.matches(REGEX_SYMBOLS)) {
+            throw new IllegalArgumentException(dataIsSymbol);
+        }
+        if (input.matches(REGEX_LETTER)) {
+            throw new IllegalArgumentException(dataIsLetter);
         }
         if (input.toCharArray().length > 1) {
             throw new IllegalArgumentException(oneCharacter);

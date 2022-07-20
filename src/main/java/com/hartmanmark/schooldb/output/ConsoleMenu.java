@@ -28,7 +28,7 @@ public class ConsoleMenu {
 
     public void runConsole() throws ClassNotFoundException, SQLException, IOException, NullPointerException {
         System.out.print(separator + "\n" + welcom);
-        String number;
+        String number = null;
         while (true) {
             try {
                 printMenu(options);

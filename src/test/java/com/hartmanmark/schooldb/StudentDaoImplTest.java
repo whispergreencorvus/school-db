@@ -1,5 +1,8 @@
 package com.hartmanmark.schooldb;
 
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
@@ -16,11 +19,13 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.hartmanmark.schooldb.dao.Connector;
 import com.hartmanmark.schooldb.dao.StudentDaoImpl;
 import com.hartmanmark.schooldb.service.ReaderPropertiesFile;
+import com.hartmanmark.schooldb.service.StudentService;
 import com.hartmanmark.schooldb.utils.DataBaseCreator;
 import com.hartmanmark.schooldb.validator.Validator;
 
@@ -33,7 +38,7 @@ class StudentDaoImplTest {
     @Mock
     Connector connector;
 
-    @Mock
+    @Spy
     Validator validator;
 
     @Mock
@@ -42,99 +47,126 @@ class StudentDaoImplTest {
     @InjectMocks
     StudentDaoImpl studentDaoImpl;
 
+    @InjectMocks
+    StudentService studentService;
+
     @BeforeAll
     void createDB() throws NullPointerException, SQLException, IOException {
         DataBaseCreator creator = new DataBaseCreator();
         creator.createDataBase();
     }
 
-    private int count(String query) throws SQLException, IOException {
-        int number = 0;
-        try (Connection conn = Connector.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
-            try (ResultSet resultSet = stmt.executeQuery()) {
-                while (resultSet.next()) {
-                    number = resultSet.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            throw new SQLException(e);
-        }
-        return number;
-    }
-
-    @Test
-    void addToTheCourse_shouldAddStudentToTheCourse_whenUserInputStudentIdAndCourseId() throws ClassNotFoundException, NullPointerException, IOException, SQLException {
-        String studentId = "35";
-        String courseId = "4";
-        studentDaoImpl.addToTheCourse(studentId, courseId);
-        List<String> result = new ArrayList<>();
+    private String findStudentIdInCourse(String id) throws SQLException, IOException {
+        String studentId = null;
         try (Connection conn = Connector.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(
-                        "SELECT school.students_courses.course_id, school.students_courses.student_id "
-                                + "FROM school.students_courses  WHERE school.students_courses.course_id = ? "
-                                + "AND school.students_courses.student_id = ?;")) {
-            int courseIdInt = Integer.parseInt(courseId);
-            int studentIdInt = Integer.parseInt(studentId);
-            stmt.setInt(1, courseIdInt);
-            stmt.setInt(2, studentIdInt);
+                        "SELECT school.students_courses.id FROM school.students_courses WHERE school.students_courses.id = ?")) {
+            int idAsInt = Integer.parseInt(id);
+            stmt.setInt(1, idAsInt);
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
-                    result.add(0, resultSet.getString(1));
-                    result.add(1, resultSet.getString(2));
+                    studentId = resultSet.getString(1);
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        assertEquals(courseId, result.get(0));
-        assertEquals(studentId, result.get(1));
+        return studentId;
     }
 
     @Test
-    void removeFromTheCourse_shouldDeleteStudentFromTheCourse_whenUserInputStudentIdAndCourseId()
+    void addToTheCourse_getIllegalArgumentException_whenInputDataIsNull()
             throws ClassNotFoundException, NullPointerException, IOException, SQLException {
-        String studentId = "35";
-        String courseId = "4";
-        String query = "SELECT count(*) from school.students_courses;";
-        int numberOfStudentsBeforeDelete = count(query);
-        studentDaoImpl.removeFromTheCourse(studentId, courseId);
-        int numberOfStudentsAfterDelete = count(query);
-        assertEquals(numberOfStudentsBeforeDelete - 1, numberOfStudentsAfterDelete);
+        assertThrows(IllegalArgumentException.class, () -> {
+            studentDaoImpl.addToTheCourse(null, null);
+        });
     }
 
     @Test
-    void create_shouldCreateStudent_whenUserInputFirstNameAndLastName() throws ClassNotFoundException, NullPointerException, IOException, SQLException {
-        String firstName = "Thomas     ";
-        String lastName = "Lawrence   ";
-        studentDaoImpl.create(firstName, lastName);
-        List<String> result = new ArrayList<>();
+    void addToTheCourse_getNotNullIsTrue_whenUserInputStudentIdAndCourseId()
+            throws ClassNotFoundException, NullPointerException, IOException, SQLException {
+        assertNotNull(studentDaoImpl.addToTheCourse("35", "4"));
+    }
+
+    @Test
+    void addToTheCourse_shouldFindStudentFromTheCourse_whenUserAddStudentToTheCourse()
+            throws ClassNotFoundException, NullPointerException, IOException, SQLException {
+        String createdId = studentDaoImpl.addToTheCourse("35", "4");
+        assertEquals(createdId, findStudentIdInCourse(createdId));
+    }
+
+    @Test
+    void create_getIllegalArgumentException_whenInputDataIsNull()
+            throws ClassNotFoundException, NullPointerException, IOException, SQLException {
+        assertThrows(IllegalArgumentException.class, () -> {
+            studentDaoImpl.create(null, null);
+        });
+    }
+
+    @Test
+    void create_shouldFindStudentId_whenUserCreateStudent()
+            throws ClassNotFoundException, NullPointerException, IOException, SQLException {
+        String firstName = "Thomas";
+        String lastName = "Lawrence";
+        int studentId = Integer.parseInt(studentDaoImpl.create(firstName, lastName));
+        int findedStudentId = 0;
         try (Connection conn = Connector.getConnection();
-                PreparedStatement stmt = conn
-                        .prepareStatement("SELECT school.students.first_name, school.students.last_name "
-                                + "FROM school.students  WHERE school.students.first_name = ? "
-                                + "AND school.students.last_name = ?;")) {
-            stmt.setString(1, firstName);
-            stmt.setString(2, lastName);
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT school.students.student_id FROM school.students WHERE school.students.student_id = ? ;")) {
+            stmt.setInt(1, studentId);
             try (ResultSet resultSet = stmt.executeQuery()) {
                 while (resultSet.next()) {
-                    result.add(0, resultSet.getString(1));
-                    result.add(1, resultSet.getString(2));
+                    findedStudentId = resultSet.getInt(1);
                 }
             }
         } catch (SQLException e) {
             throw new SQLException(e);
         }
-        assertEquals(firstName, result.get(0));
-        assertEquals(lastName, result.get(1));
+        assertEquals(studentId, findedStudentId);
     }
 
     @Test
-    void removeStudent_shouldDeleteStudent_whenUserInputStudentId() throws ClassNotFoundException, NullPointerException, IOException, SQLException {
+    void findInCourse_getIllegalArgumentException_whenInputDataIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            studentDaoImpl.findInCourse(null);
+        });
+    }
+
+    @Test
+    void findStudent_getIllegalArgumentException_whenInputDataIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            studentDaoImpl.findStudent(null);
+        });
+    }
+
+    @Test
+    void findCourse_getIllegalArgumentException_whenInputDataIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            studentDaoImpl.findCourse(null);
+        });
+    }
+
+    @Test
+    void removeFromTheCourse_getIllegalArgumentException_whenInputDataIsNull()
+            throws ClassNotFoundException, NullPointerException, IOException, SQLException {
+        assertThrows(IllegalArgumentException.class, () -> {
+            studentDaoImpl.removeFromTheCourse(null, null);
+        });
+    }
+
+    @Test
+    void removeFromTheCourse_getNull_whenUserDeleteStudentFromTheCourse()
+            throws ClassNotFoundException, NullPointerException, IOException, SQLException {
+        studentDaoImpl.addToTheCourse("35", "4");
+        assertNull(findStudentIdInCourse(studentDaoImpl.removeFromTheCourse("35", "4")));
+    }
+
+    @Test
+    void removeStudent_shouldDeleteStudent_whenUserInputStudentId()
+            throws ClassNotFoundException, NullPointerException, IOException, SQLException {
         String studentId = "25";
-        String query = "SELECT count(*) from school.students;";
-        int numberOfStudentsBeforeDelete = count(query);
         studentDaoImpl.removeStudent(studentId);
-        int numberOfStudentsAfterDelete = count(query);
-        assertEquals(numberOfStudentsBeforeDelete - 1, numberOfStudentsAfterDelete);
+        List<String> emptyArray = new ArrayList<String>();
+        assertEquals(emptyArray, studentDaoImpl.findStudent(studentId));
     }
 }

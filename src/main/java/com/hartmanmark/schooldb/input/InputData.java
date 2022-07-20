@@ -49,13 +49,7 @@ public class InputData {
         String firstName = reader.read();
         System.out.println(enterLastName + "\n");
         String lastName = reader.read();
-        return studentService.printCreated(studentDao.create(firstName, lastName)) + "\n";
-    }
-
-    public String deleteStudent() throws ClassNotFoundException, NullPointerException, SQLException, IOException {
-        System.out.println(enterStudentIdBetween + daoAdditional.countNumber());
-        String studentId = reader.read();
-        return studentService.printRemovedStudent(studentDao.removeStudent(studentId)) + "\n";
+        return studentService.printCreated(studentDao.findStudent(studentDao.create(firstName, lastName))) + "\n";
     }
 
     public String addStudentToTheCourse()
@@ -66,6 +60,12 @@ public class InputData {
         String courseId = reader.read();
         studentDao.addToTheCourse(studentId, courseId);
         return studentService.printAdded(studentDao.findStudent(studentId), daoAdditional.findCourse(courseId)) + "\n";
+    }
+
+    public String deleteStudent() throws ClassNotFoundException, NullPointerException, SQLException, IOException {
+        System.out.println(enterStudentIdBetween + daoAdditional.countNumber());
+        String studentId = reader.read();
+        return studentService.printRemovedStudent(studentDao.removeStudent(studentId)) + "\n";
     }
 
     public String removeStudentFromTheCourse()
