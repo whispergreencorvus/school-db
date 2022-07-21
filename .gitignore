@@ -1,0 +1,10 @@
+# ignore all files in any directory named 
+.*
+!/.gitignore
+!/.editorconfig
+.settings/
+bin/
+.classpath
+.project
+target/
+
